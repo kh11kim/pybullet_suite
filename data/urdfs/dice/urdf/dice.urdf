@@ -1,0 +1,683 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-1-g15f4949  Build Version: 1.6.7594.29634
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="dice">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-2.66766240138851E-18 0 1.73472347597681E-18"
+        rpy="0 0 0" />
+      <mass
+        value="0.001" />
+      <inertia
+        ixx="1.66666666666667E-08"
+        ixy="-8.67077671120512E-25"
+        ixz="-3.44041988923179E-25"
+        iyy="1.66666666666667E-08"
+        iyz="-3.78038207477916E-25"
+        izz="1.66666666666667E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="link_F">
+    <inertial>
+      <origin
+        xyz="-9.50512573988481E-05 4.92688674394559E-05 -0.00351193570807691"
+        rpy="0 0 0" />
+      <mass
+        value="0.00411752113638231" />
+      <inertia
+        ixx="2.24591411192829E-07"
+        ixy="4.1775457465822E-10"
+        ixz="3.96046905828484E-10"
+        iyy="2.27172193413413E-07"
+        iyz="-2.05286947664401E-10"
+        izz="3.96928952994179E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_F.STL" />
+      </geometry>
+      <material
+        name="red">
+        <color
+          rgba="1 0 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_F.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_F"
+    type="fixed">
+    <origin
+      xyz="0.015 0 0"
+      rpy="-1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="link_F" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="link_letter_F">
+    <inertial>
+      <origin
+        xyz="-0.00181350065894689 0.000940009906361396 -0.0025"
+        rpy="0 0 0" />
+      <mass
+        value="0.000215812196951019" />
+      <inertia
+        ixx="4.74149938848785E-09"
+        ixy="-8.049341101153E-10"
+        ixz="1.38286838893634E-26"
+        iyy="1.61444722525123E-09"
+        iyz="-2.27586779268183E-25"
+        izz="5.45672912644316E-09" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_letter_F.STL" />
+      </geometry>
+      <material
+        name="black">
+        <color
+          rgba="0 0 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_letter_F.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_letter_F"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 -3.14159265358979" />
+    <parent
+      link="link_F" />
+    <child
+      link="link_letter_F" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="link_B">
+    <inertial>
+      <origin
+        xyz="1.94927574249588E-05 -7.81931638434252E-05 0.00354516982610781"
+        rpy="0 0 0" />
+      <mass
+        value="0.0039866290374869" />
+      <inertia
+        ixx="2.20094886421421E-07"
+        ixy="2.78909724079855E-10"
+        ixz="8.13467845835244E-11"
+        iyy="2.25751803876546E-07"
+        iyz="-3.25937949196092E-10"
+        izz="3.91834477384909E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_B.STL" />
+      </geometry>
+      <material
+        name="orange">
+        <color
+          rgba="1 0.498 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_B.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_B"
+    type="fixed">
+    <origin
+      xyz="-0.015 0 0"
+      rpy="1.5707963267949 0 1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="link_B" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="link_letter_B">
+    <inertial>
+      <origin
+        xyz="0.000225151490672439 -0.000901444768498538 0.00250001505244807"
+        rpy="0 0 0" />
+      <mass
+        value="0.000346813932855846" />
+      <inertia
+        ixx="8.99761241320047E-09"
+        ixy="-3.52365205874907E-10"
+        ixz="5.5591649616148E-15"
+        iyy="3.62562344499346E-09"
+        iyz="-2.57589182593363E-14"
+        izz="1.11782203674508E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_letter_B.STL" />
+      </geometry>
+      <material
+        name="black">
+        <color
+          rgba="0 0 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_letter_B.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_letter_B"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 3.14159265358979" />
+    <parent
+      link="link_B" />
+    <child
+      link="link_letter_B" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="link_L">
+    <inertial>
+      <origin
+        xyz="-7.26717053836479E-05 6.9109794379726E-05 0.00349907074228167"
+        rpy="0 0 0" />
+      <mass
+        value="0.00417054217517258" />
+      <inertia
+        ixx="2.24579816896208E-07"
+        ixy="3.68564469772318E-10"
+        ixz="-3.02798772431858E-10"
+        iyy="2.2799869045033E-07"
+        iyz="2.8795747658216E-10"
+        izz="3.97415726691221E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_L.STL" />
+      </geometry>
+      <material
+        name="green">
+        <color
+          rgba="0 1 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_L.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_L"
+    type="fixed">
+    <origin
+      xyz="0 0.015 0"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="link_L" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="link_letter_L">
+    <inertial>
+      <origin
+        xyz="-0.00186177440880996 -0.0017705219093871 -0.0025"
+        rpy="0 0 0" />
+      <mass
+        value="0.00016279115816075" />
+      <inertia
+        ixx="4.47715992217448E-09"
+        ixy="9.26120804927491E-10"
+        ixz="3.19323213218057E-25"
+        iyy="1.00222206440924E-09"
+        iyz="-4.45706747723961E-26"
+        izz="4.80108549424727E-09" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_letter_L.STL" />
+      </geometry>
+      <material
+        name="black">
+        <color
+          rgba="0 0 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_letter_L.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_letter_L"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="3.14159265358979 0 3.14159265358979" />
+    <parent
+      link="link_L" />
+    <child
+      link="link_letter_L" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="link_R">
+    <inertial>
+      <origin
+        xyz="4.07208019225084E-06 -9.46811327945319E-05 0.00354091263991495"
+        rpy="0 0 0" />
+      <mass
+        value="0.0040028736788808" />
+      <inertia
+        ixx="2.21225318375563E-07"
+        ixy="-1.72199688799733E-10"
+        ixz="1.68852294481576E-11"
+        iyy="2.25392434040849E-07"
+        iyz="-3.94464690581226E-10"
+        izz="3.92502204652984E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_R.STL" />
+      </geometry>
+      <material
+        name="yellow">
+        <color
+          rgba="1 1 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_R.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_R"
+    type="fixed">
+    <origin
+      xyz="0 -0.015 0"
+      rpy="1.5707963267949 0 3.14159265358979" />
+    <parent
+      link="base_link" />
+    <child
+      link="link_R" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="link_letter_R">
+    <inertial>
+      <origin
+        xyz="4.84262186075055E-05 0.00114631655590035 -0.00249997381541772"
+        rpy="0 0 0" />
+      <mass
+        value="0.000330397797517397" />
+      <inertia
+        ixx="7.71637305365668E-09"
+        ixy="-1.51008081448684E-10"
+        ixz="-3.05343836971532E-14"
+        iyy="4.01814143157033E-09"
+        iyz="-7.66018160442713E-14"
+        izz="1.03577451336102E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_letter_R.STL" />
+      </geometry>
+      <material
+        name="black">
+        <color
+          rgba="0 0 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_letter_R.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_letter_R"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="-3.14159265358979 0 3.14159265358979" />
+    <parent
+      link="link_R" />
+    <child
+      link="link_letter_R" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="link_U">
+    <inertial>
+      <origin
+        xyz="3.26036309539202E-06 5.24661179217773E-05 0.00352418792456442"
+        rpy="0 0 0" />
+      <mass
+        value="0.00406827782939128" />
+      <inertia
+        ixx="2.22348800183004E-07"
+        ixy="-4.87811881417785E-12"
+        ixz="1.34925868413748E-11"
+        iyy="2.24867386424086E-07"
+        iyz="2.18716156107312E-10"
+        izz="3.92688856232812E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_U.STL" />
+      </geometry>
+      <material
+        name="blue">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_U.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_U"
+    type="fixed">
+    <origin
+      xyz="0 0 0.015"
+      rpy="-3.14159265358979 0 3.14159265358979" />
+    <parent
+      link="base_link" />
+    <child
+      link="link_U" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="link_letter_U">
+    <inertial>
+      <origin
+        xyz="4.99776081315758E-05 -0.000805769148246406 -0.00250003965080142"
+        rpy="0 0 0" />
+      <mass
+        value="0.00026506309406237" />
+      <inertia
+        ixx="6.95135122252641E-09"
+        ixy="-1.65877323851595E-11"
+        ixz="2.35461602000937E-14"
+        iyy="4.61401901538874E-09"
+        iyz="-3.97395234832372E-14"
+        izz="1.04609430636761E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_letter_U.STL" />
+      </geometry>
+      <material
+        name="white">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_letter_U.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_letter_U"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="-3.14159265358979 0 3.14159265358979" />
+    <parent
+      link="link_U" />
+    <child
+      link="link_letter_U" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="link_D">
+    <inertial>
+      <origin
+        xyz="-3.71350332799622E-05 -5.47256362516592E-05 0.00354710064885572"
+        rpy="0 0 0" />
+      <mass
+        value="0.00397923436342819" />
+      <inertia
+        ixx="2.1807910831628E-07"
+        ixy="1.92238618844472E-10"
+        ixz="-1.54682719103127E-10"
+        iyy="2.21564250025753E-07"
+        iyz="-2.27940317252461E-10"
+        izz="3.85677921303229E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_D.STL" />
+      </geometry>
+      <material
+        name="purple">
+        <color
+          rgba="0.294 0 0.509 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_D.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_D"
+    type="fixed">
+    <origin
+      xyz="0 0 -0.015"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="link_D" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="link_letter_D">
+    <inertial>
+      <origin
+        xyz="-0.00041734 0.00061475 -0.0025"
+        rpy="0 0 0" />
+      <mass
+        value="0.00035406" />
+      <inertia
+        ixx="1.116E-08"
+        ixy="9.4068E-11"
+        ixz="4.0081E-14"
+        iyy="7.7565E-09"
+        iyz="-4.0819E-14"
+        izz="1.7441E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_letter_D.STL" />
+      </geometry>
+      <material
+        name="white">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dice/meshes/link_letter_D.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_letter_D"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="3.14159265358979 0 -3.14159265358979" />
+    <parent
+      link="link_D" />
+    <child
+      link="link_letter_D" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>
