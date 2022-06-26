@@ -1,8 +1,8 @@
 import numpy as np
-from typing import Any, Dict, Optional, Iterable
-from mode_forest.ezbullet.world import BulletWorld, Body
-from mode_forest.ezbullet.transform import Rotation, Transform
 import pybullet as p
+from typing import Any, Dict, Optional, Iterable
+from pybullet_suite.base import *
+
 
 """BulletSceneMaker : Helper class to make objects.
 
@@ -270,7 +270,7 @@ class BulletSceneMaker:
             )
         else:
             body = self.world.bodies[name]
-            pose = Transform(Rotation.Identity(), position)
+            pose = Pose(Rotation.Identity(), position)
             body.set_base_pose(name, pose)
     
     def view_point(
@@ -293,12 +293,12 @@ class BulletSceneMaker:
             )
         else:
             body = self.world.bodies[name]
-            pose = Transform(Rotation.identity(), position)
+            pose = Pose(Rotation.identity(), position)
             body.set_base_pose(pose)
     
     def view_frame(
         self, 
-        pose: Transform, 
+        pose: Pose, 
         name: Optional[str] = None,
         length: float = 0.05
     ): #pos, orn

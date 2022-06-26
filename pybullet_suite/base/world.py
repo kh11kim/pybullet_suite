@@ -1,10 +1,11 @@
 import time
 import numpy as np
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, Dict
 import pybullet as p
-from pybullet_utils.bullet_client import BulletClient
+
 #from pybullet_suite.base.world import workspace_lines
+from pybullet_utils.bullet_client import BulletClient
 from pybullet_suite.base.body import Body
 from pybullet_suite.base.camera import Camera, CameraIntrinsic
 from pybullet_suite.base.tf import Rotation, Pose
@@ -21,8 +22,8 @@ class BulletWorld:
     ):
         self.gui = gui
         self.dt = dt
-        self.bodies = {}
-        self.body_names = {}
+        self._bodies = {}
+        self._body_names = {}
         options = ""
         if background_color is not None:
             background_color = background_color.astype(np.float64) / 255
@@ -36,6 +37,14 @@ class BulletWorld:
             options=options
         )
         self.reset()
+    
+    @property
+    def bodies(self)->Dict[Body]:
+        return self._bodies
+
+    @property
+    def body_names(self)->Dict[int]:
+        return self._body_names
     
     ## ------------------------------------------------------------
     ## Simulation
