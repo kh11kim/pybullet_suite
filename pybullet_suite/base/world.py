@@ -39,11 +39,11 @@ class BulletWorld:
         self.reset()
     
     @property
-    def bodies(self)->Dict[Body]:
+    def bodies(self)->Dict[str, Body]:
         return self._bodies
 
     @property
-    def body_names(self)->Dict[int]:
+    def body_names(self)->Dict[int, str]:
         return self._body_names
     
     ## ------------------------------------------------------------
@@ -55,7 +55,8 @@ class BulletWorld:
             fixedTimeStep=self.dt,
             numSolverIterations=SOLVER_ITERATIONS
         )
-        self.bodies = {}
+        self._bodies = {}
+        self._body_names = {}
         self.sim_time = 0.0
     
     def step(self, only_collision_detection=False):
