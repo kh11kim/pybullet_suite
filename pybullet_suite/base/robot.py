@@ -71,9 +71,8 @@ class Robot(Body):
         pose: Pose = Pose.identity(),
         use_fixed_base: bool = True
     ):
-        urdf_path = "data/urdfs/panda/franka_panda.urdf"
         body_uid = physics_client.loadURDF(
-            urdf_path,
+            cls.urdf_path,
             pose.trans,
             pose.rot.as_quat(),
             useFixedBase=use_fixed_base,

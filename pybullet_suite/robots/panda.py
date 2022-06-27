@@ -1,6 +1,8 @@
 from ..base import *
+from ...data import PANDA_URDF
 
 class Panda(Robot):
+    urdf_path = PANDA_URDF
     def __init__(self, physics_client: BulletClient, body_uid: int):
         self.arm_idxs = range(7)
         self.finger_idxs = [8, 9]
