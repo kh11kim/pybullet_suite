@@ -1,4 +1,4 @@
-from pybullet_suite.base import *
+from ..base import *
 
 class Panda(Robot):
     def __init__(self, physics_client: BulletClient, body_uid: int):

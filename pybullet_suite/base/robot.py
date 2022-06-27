@@ -3,8 +3,8 @@ from typing import Optional, Union
 from contextlib import contextmanager
 
 from pybullet_utils.bullet_client import BulletClient
-from pybullet_suite.base.body import Body
-from pybullet_suite.base.tf import Rotation, Pose
+from .body import Body
+from .tf import Rotation, Pose
 
 class Robot(Body):
     """Actuated body(robot) class.

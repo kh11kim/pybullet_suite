@@ -8,10 +8,10 @@ from collections import namedtuple
 
 #from pybullet_suite.base.world import workspace_lines
 from pybullet_utils.bullet_client import BulletClient
-from pybullet_suite.base.body import Body
-from pybullet_suite.base.camera import Camera, CameraIntrinsic
-from pybullet_suite.base.tf import Rotation, Pose
-from pybullet_suite.base.robot import Robot
+from .body import Body
+from .camera import Camera, CameraIntrinsic
+from .tf import Rotation, Pose
+from .robot import Robot
 
 SOLVER_ITERATIONS = 150
 COLLISION_DISTANCE = 0.

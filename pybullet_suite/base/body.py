@@ -3,7 +3,7 @@ import trimesh
 from contextlib import contextmanager
 from typing import Tuple
 from pybullet_utils.bullet_client import BulletClient
-from pybullet_suite.base.tf import Rotation, Pose
+from .tf import Rotation, Pose
 
 
 JOINT_ATRTIBUTE_NAMES = \

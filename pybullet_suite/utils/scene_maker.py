@@ -1,7 +1,7 @@
 import numpy as np
 import pybullet as p
 from typing import Any, Dict, Optional, Iterable
-from pybullet_suite.base import *
+from ..base import *
 
 
 """BulletSceneMaker : Helper class to make objects.
