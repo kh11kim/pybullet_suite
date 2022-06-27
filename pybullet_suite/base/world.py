@@ -1,8 +1,10 @@
 import time
 import numpy as np
 from dataclasses import dataclass
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Union
 import pybullet as p
+from itertools import combinations
+from collections import namedtuple
 
 #from pybullet_suite.base.world import workspace_lines
 from pybullet_utils.bullet_client import BulletClient
@@ -12,6 +14,34 @@ from pybullet_suite.base.tf import Rotation, Pose
 from pybullet_suite.base.robot import Robot
 
 SOLVER_ITERATIONS = 150
+COLLISION_DISTANCE = 0.
+
+@dataclass
+class Contact:
+    bodyA: Body
+    bodyB: Body
+    point: np.ndarray
+    normal: np.ndarray
+    depth: float
+    force: float
+
+@dataclass
+class CollisionInfo:
+    contact_flag: bool
+    bodyA: int
+    bodyB: int
+    linkA: int
+    linkB: int
+    position_on_A: List[float]
+    position_on_B: List[float]
+    contact_normal_on_B: List[float]
+    contact_distnace: float
+    normal_force: float
+    lateral_frictionA: float
+    lateral_friction_dirA: List[float]
+    lateral_frictionB: float
+    lateral_friction_dirB: List[float]
+
 
 class BulletWorld:
     def __init__(
@@ -172,6 +202,84 @@ class BulletWorld:
         camera = Camera(self.physics_client, intrinsic, near, far)
         return camera
     
+    #---------------collision detection----------------------
+    def get_closest_points(
+        self, 
+        body1: Body, body2: Body, 
+        link1:int=None, link2:int=None
+    ):
+        if (link1 is not None) & (link2 is not None):
+            results = self.physics_client.getClosestPoints(
+                bodyA=body1.uid, bodyB=body2.uid, 
+                linkIndexA=link1, linkIndexB=link2,
+                distance=COLLISION_DISTANCE)
+        elif (link1 is None) & (link2 is None):
+            results = self.physics_client.getClosestPoints(
+                bodyA=body1.uid, bodyB=body2.uid, 
+                distance=COLLISION_DISTANCE)
+        return [CollisionInfo(*info) for info in results]
+    
+    def is_body_pairwise_collision(
+        self, body: Union[str, Body], obstacles: Union[List[str], List[Body]], **kwargs)->bool:
+        """Get boolean whether two body is in collision
+
+        Args:
+            body (Union[str, Body]): target body
+            obstacles (Union[List[str], List[Body]]): a list of obstacles. One body is also available.
+
+        Returns:
+            bool: True if the body has a collision with obstacles
+        """
+        if isinstance(body, str):
+            body = self.bodies[str]
+        if not isinstance(obstacles, List):
+            obstacles = [obstacles]
+        if isinstance(obstacles[0], str):
+            obstacles = [self.bodies[name] for name in obstacles]
+
+        return any(self.get_closest_points(body, other, **kwargs) \
+            for other in obstacles if body.uid != other.uid)
+
+    def is_link_pairwise_collision(
+        self, 
+        body1: Union[str, Body], 
+        body2: Union[str, Body],
+        link1: int,
+        link2: int
+    ):
+        if isinstance(body1, str):
+            body1 = self.bodies[str]
+        if isinstance(body1, str):
+            body2 = self.bodies[str]
+        point = self.get_closest_points(
+            body1=body1, body2=body2, 
+            link1=link1, link2=link2)
+        if point:
+            return True
+        return False
+
+    def is_self_collision(self, robot: Union[str, Robot])-> bool:
+        """Get boolean whether the robot is in self-collision
+
+        Args:
+            robot (Union[str, Robot]): The robot
+
+        Returns:
+            bool: True if the robot is in self-collision.
+        """
+        if isinstance(robot, str):
+            robot = self.bodies[robot]
+
+        for link1, link2 in combinations(robot.info.keys(), 2):
+            adjacent = (link1 == robot.info[link2]["parent_index"])
+            if not adjacent:
+                is_col = self.is_link_pairwise_collision(
+                    robot, robot, link1, link2)
+                if is_col:
+                    return True
+        return False
+                
+
     def get_contacts(
         self, 
         name: Optional[str] = None, 
@@ -208,19 +316,13 @@ class BulletWorld:
                 return True
         return False
 
-    def get_stable_z(
-        self,
-        body: Body,
-    ):
-        pass
-
-    def draw_workspace(self, size, mid):
-        points = workspace_lines(size, mid)
-        color = [0.5, 0.5, 0.5]
-        for i in range(0, len(points), 2):
-            self.physics_client.addUserDebugLine(
-                lineFromXYZ=points[i], lineToXYZ=points[i + 1], lineColorRGB=color
-            )
+    # def draw_workspace(self, size, mid):
+    #     points = workspace_lines(size, mid)
+    #     color = [0.5, 0.5, 0.5]
+    #     for i in range(0, len(points), 2):
+    #         self.physics_client.addUserDebugLine(
+    #             lineFromXYZ=points[i], lineToXYZ=points[i + 1], lineColorRGB=color
+    #         )
     
     def wait_for_rest(self, timeout=2.0, tol=0.01):
         timeout = self.sim_time + timeout
@@ -233,16 +335,6 @@ class BulletWorld:
                 if np.linalg.norm(body.get_base_velocity()) > tol:
                     is_rest = False
                     break
-
-@dataclass
-class Contact(object):
-    bodyA: Body
-    bodyB: Body
-    point: np.ndarray
-    normal: np.ndarray
-    depth: float
-    force: float
-
 
 if __name__ == "__main__":
     world = BulletWorld(gui=True)
