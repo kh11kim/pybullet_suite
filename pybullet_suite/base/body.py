@@ -34,7 +34,7 @@ class Body:
     )->"Body":
         body_uid = physics_client.loadURDF(
             fileName=str(urdf_path),
-            basePosition=pose.t,
+            basePosition=pose.trans,
             baseOrientation=pose.rot.as_quat(),
             useFixedBase=use_fixed_base,
             globalScaling=scale,
