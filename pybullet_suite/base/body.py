@@ -117,7 +117,7 @@ class Body:
             pose (Pose): Pose to set
         """
         self.physics_client.resetBasePositionAndOrientation(
-            self.uid, pose.t, pose.rot.as_quat()
+            self.uid, pose.trans, pose.rot.as_quat()
         )
     
     def get_base_velocity(self)->Tuple[np.ndarray, np.ndarray]:

@@ -23,7 +23,7 @@ class Pose:
         rot: Rotation = Rotation.identity(), 
         trans: Union[np.ndarray, list] = [0.,0.,0.]):
         assert isinstance(rot, scipy.spatial.transform.Rotation)
-        assert isinstance(trans, (np.ndarray, list))
+        assert isinstance(trans, (np.ndarray, list, tuple))
 
         self.rot = rot
         self.trans = np.asarray(trans, np.double)
@@ -69,18 +69,6 @@ class Pose:
         translation = m[:3, 3]
         return cls(rotation, translation)
 
-    # @classmethod
-    # def from_dict(cls, dictionary):
-    #     rotation = Rotation.from_quat(dictionary["rotation"])
-    #     translation = np.asarray(dictionary["translation"])
-    #     return cls(rotation, translation)
-
-    # @classmethod
-    # def from_list(cls, list):
-    #     rotation = Rotation.from_quat(list[:4])
-    #     translation = list[4:]
-    #     return cls(rotation, translation)
-
     @classmethod
     def identity(cls):
         """Initialize with the identity transformation."""
@@ -117,27 +105,27 @@ class Pose:
         return cls.from_matrix(m).inverse()
 
 # Quaternion functions
-# def qtn_conj(qtn):
-#     return np.hstack([-qtn[:3], qtn[-1]])
+def qtn_conj(qtn):
+    return np.hstack([-qtn[:3], qtn[-1]])
 
-# def qtn_mul(a, b):
-#     x1, y1, z1, w1 = a
-#     x2, y2, z2, w2 = b
-#     ww = (z1 + x1) * (x2 + y2)
-#     yy = (w1 - y1) * (w2 + z2)
-#     zz = (w1 + y1) * (w2 - z2)
-#     xx = ww + yy + zz
-#     qq = 0.5 * (xx + (z1 - x1) * (x2 - y2))
-#     w = qq - ww + (z1 - y1) * (y2 - z2)
-#     x = qq - xx + (x1 + w1) * (x2 + w2)
-#     y = qq - yy + (w1 - x1) * (y2 + z2)
-#     z = qq - zz + (z1 + y1) * (w2 - x2)
-#     return np.array([x, y, z, w])
+def qtn_mul(a, b):
+    x1, y1, z1, w1 = a
+    x2, y2, z2, w2 = b
+    ww = (z1 + x1) * (x2 + y2)
+    yy = (w1 - y1) * (w2 + z2)
+    zz = (w1 + y1) * (w2 - z2)
+    xx = ww + yy + zz
+    qq = 0.5 * (xx + (z1 - x1) * (x2 - y2))
+    w = qq - ww + (z1 - y1) * (y2 - z2)
+    x = qq - xx + (x1 + w1) * (x2 + w2)
+    y = qq - yy + (w1 - x1) * (y2 + z2)
+    z = qq - zz + (z1 + y1) * (w2 - x2)
+    return np.array([x, y, z, w])
 
-# def orn_error(desired, current):
-#     cc = qtn_conj(current)
-#     q_r = qtn_mul(desired, cc)
-#     return q_r[:3] * np.sign(q_r[-1])
+def orn_error(desired, current):
+    cc = qtn_conj(current)
+    q_r = qtn_mul(desired, cc)
+    return q_r[:3] * np.sign(q_r[-1])
 
 # def slerp(qtn1, qtn2, ratio):
 #     if np.allclose(qtn1, qtn2) | np.allclose(qtn1, -qtn2):

@@ -231,7 +231,7 @@ class BulletWorld:
             bool: True if the body has a collision with obstacles
         """
         if isinstance(body, str):
-            body = self.bodies[str]
+            body = self.bodies[body]
         if not isinstance(obstacles, List):
             obstacles = [obstacles]
         if isinstance(obstacles[0], str):

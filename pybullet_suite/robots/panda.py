@@ -28,7 +28,7 @@ class Panda(Robot):
         orn = None
         success = False
         if pose is not None:
-            pos, orn = pose.t, pose.rot.as_quat()
+            pos, orn = pose.trans, pose.rot.as_quat()
         with self.no_set_joint():
             for i in range(max_iter):
                 joint_angles = self.physics_client.calculateInverseKinematics(
@@ -37,9 +37,9 @@ class Panda(Robot):
                     targetPosition=pos,
                     targetOrientation=orn
                 )
-                self.set_arm_angles(joint_angles)
+                self.set_joint_angles(joint_angles)
                 pose_curr = self.get_ee_pose()
-                if np.linalg.norm(pose_curr.t - pos) < tol:
+                if np.linalg.norm(pose_curr.trans - pos) < tol:
                     success = True
                     break
         if success:
@@ -51,7 +51,7 @@ class Panda(Robot):
         angles: np.ndarray
     ):
         with self.no_set_joint():
-            self.set_arm_angles(angles)
+            self.set_joint_angles(angles)
             pose = self.get_ee_pose()
         return pose
     
@@ -75,16 +75,16 @@ class Panda(Robot):
         )
         return np.vstack([jac_trans, jac_rot])[:,:-2]
 
-    def get_arm_angles(self):
-        return self.get_joint_angles()[self.arm_idxs]
+    def get_joint_angles(self):
+        return super().get_joint_angles()[self.arm_idxs]
     
     def get_random_arm_angles(self):
         q = np.random.uniform(low=self.arm_lower_limit, high=self.arm_upper_limit)
         return q
 
-    def set_arm_angles(self, angles: np.ndarray):
+    def set_joint_angles(self, angles: np.ndarray):
         for i, angle in zip(self.arm_idxs, angles):
-            self.set_joint_angle(joint=i, angle=angle) 
+            super().set_joint_angle(joint=i, angle=angle) 
     
     def open(self, ctrl=False):
         if ctrl == False:
@@ -99,5 +99,5 @@ class Panda(Robot):
 if __name__ == "__main__":
     world = BulletWorld(gui=True)
     robot: Panda = world.load_robot("robot", robot_class=Panda)
-    robot.set_arm_angles([0,0,0,0,0,0,0])
+    robot.set_joint_angles([0,0,0,0,0,0,0])
     input()
