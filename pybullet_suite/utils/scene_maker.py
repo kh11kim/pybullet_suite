@@ -12,152 +12,6 @@ class BulletSceneMaker:
         self.world = world
         self.physics_client = self.world.physics_client
 
-    def create_box(
-        self,
-        body_name: str,
-        half_extents: np.ndarray,
-        mass: float,
-        position: np.ndarray,
-        rgba_color: Optional[np.ndarray] = np.ones(4),
-        specular_color: np.ndarray = np.zeros(3),
-        ghost: bool = False,
-        lateral_friction: Optional[float] = None,
-        spinning_friction: Optional[float] = None,
-        texture: Optional[str] = None,
-    ) -> None:
-        """Create a box.
-
-        Args:
-            body_name (str): The name of the body. Must be unique in the sim.
-            half_extents (np.ndarray): Half size of the box in meters, as (x, y, z).
-            mass (float): The mass in kg.
-            position (np.ndarray): The position, as (x, y, z).
-            rgba_color (np.ndarray, optional): Body color, as (r, g, b, a). Defaults as [0, 0, 0, 0]
-            specular_color (np.ndarray, optional): Specular color, as (r, g, b). Defaults to [0, 0, 0].
-            ghost (bool, optional): Whether the body can collide. Defaults to False.
-            lateral_friction (float or None, optional): Lateral friction. If None, use the default pybullet
-                value. Defaults to None.
-            spinning_friction (float or None, optional): Spinning friction. If None, use the default pybullet
-                value. Defaults to None.
-            texture (str or None, optional): Texture file name. Defaults to None.
-        """
-        visual_kwargs = {
-            "halfExtents": half_extents,
-            "specularColor": specular_color,
-            "rgbaColor": rgba_color,
-        }
-        collision_kwargs = {"halfExtents": half_extents}
-        self._create_geometry(
-            body_name,
-            geom_type=self.physics_client.GEOM_BOX,
-            mass=mass,
-            position=position,
-            ghost=ghost,
-            lateral_friction=lateral_friction,
-            spinning_friction=spinning_friction,
-            visual_kwargs=visual_kwargs,
-            collision_kwargs=collision_kwargs,
-        )
-        # if texture is not None:
-        #     texture_path = os.path.join(get_data_path(), texture)
-        #     texture_uid = self.physics_client.loadTexture(texture_path)
-        #     self.physics_client.changeVisualShape(self.bullet._bodies_idx[body_name], -1, textureUniqueId=texture_uid)
-
-    def create_cylinder(
-        self,
-        body_name: str,
-        radius: float,
-        height: float,
-        mass: float,
-        position: np.ndarray,
-        orientation: None,
-        rgba_color: Optional[np.ndarray] = np.zeros(4),
-        specular_color: np.ndarray = np.zeros(3),
-        ghost: bool = False,
-        lateral_friction: Optional[float] = None,
-        spinning_friction: Optional[float] = None,
-    ) -> None:
-        """Create a cylinder.
-
-        Args:
-            body_name (str): The name of the body. Must be unique in the sim.
-            radius (float): The radius in meter.
-            height (float): The height in meter.
-            mass (float): The mass in kg.
-            position (np.ndarray): The position, as (x, y, z).
-            rgba_color (np.ndarray, optional): Body color, as (r, g, b, a). Defaults as [0, 0, 0, 0]
-            specular_color (np.ndarray, optional): Specular color, as (r, g, b). Defaults to [0, 0, 0].
-            ghost (bool, optional): Whether the body can collide. Defaults to False.
-            lateral_friction (float or None, optional): Lateral friction. If None, use the default pybullet
-                value. Defaults to None.
-            spinning_friction (float or None, optional): Spinning friction. If None, use the default pybullet
-                value. Defaults to None.
-        """
-        visual_kwargs = {
-            "radius": radius,
-            "length": height,
-            "specularColor": specular_color,
-            "rgbaColor": rgba_color,
-        }
-        collision_kwargs = {"radius": radius, "height": height}
-        self._create_geometry(
-            body_name,
-            geom_type=self.physics_client.GEOM_CYLINDER,
-            mass=mass,
-            position=position,
-            orientation=orientation,
-            ghost=ghost,
-            lateral_friction=lateral_friction,
-            spinning_friction=spinning_friction,
-            visual_kwargs=visual_kwargs,
-            collision_kwargs=collision_kwargs,
-        )
-
-    def create_sphere(
-        self,
-        body_name: str,
-        radius: float,
-        mass: float,
-        position: np.ndarray,
-        rgba_color: Optional[np.ndarray] = np.zeros(4),
-        specular_color: np.ndarray = np.zeros(3),
-        ghost: bool = False,
-        lateral_friction: Optional[float] = None,
-        spinning_friction: Optional[float] = None,
-    ) -> None:
-        """Create a sphere.
-
-        Args:
-            body_name (str): The name of the body. Must be unique in the sim.
-            radius (float): The radius in meter.
-            mass (float): The mass in kg.
-            position (np.ndarray): The position, as (x, y, z).
-            rgba_color (np.ndarray, optional): Body color, as (r, g, b, a). Defaults as [0, 0, 0, 0]
-            specular_color (np.ndarray, optional): Specular color, as (r, g, b). Defaults to [0, 0, 0].
-            ghost (bool, optional): Whether the body can collide. Defaults to False.
-            lateral_friction (float or None, optional): Lateral friction. If None, use the default pybullet
-                value. Defaults to None.
-            spinning_friction (float or None, optional): Spinning friction. If None, use the default pybullet
-                value. Defaults to None.
-        """
-        visual_kwargs = {
-            "radius": radius,
-            "specularColor": specular_color,
-            "rgbaColor": rgba_color,
-        }
-        collision_kwargs = {"radius": radius}
-        self._create_geometry(
-            body_name,
-            geom_type=self.physics_client.GEOM_SPHERE,
-            mass=mass,
-            position=position,
-            ghost=ghost,
-            lateral_friction=lateral_friction,
-            spinning_friction=spinning_friction,
-            visual_kwargs=visual_kwargs,
-            collision_kwargs=collision_kwargs,
-        )
-
     def _create_geometry(
         self,
         body_name: str,
@@ -170,7 +24,7 @@ class BulletSceneMaker:
         spinning_friction: Optional[float] = None,
         visual_kwargs: Dict[str, Any] = {},
         collision_kwargs: Dict[str, Any] = {},
-    ) -> None:
+    ) -> Body:
         """Create a geometry.
 
         Args:
@@ -204,15 +58,162 @@ class BulletSceneMaker:
         if spinning_friction is not None:
             self.set_spinning_friction(body=body_name, link=-1, spinning_friction=spinning_friction)
         self.world.register_body(body_name, body)
+        return self.world.bodies[body_name]
+    
+    def create_box(
+        self,
+        body_name: str,
+        half_extents: np.ndarray,
+        mass: float,
+        position: np.ndarray,
+        rgba_color: Optional[np.ndarray] = np.ones(4),
+        specular_color: np.ndarray = np.zeros(3),
+        ghost: bool = False,
+        lateral_friction: Optional[float] = None,
+        spinning_friction: Optional[float] = None,
+        texture: Optional[str] = None,
+    ) -> Body:
+        """Create a box.
 
-    def create_plane(self, z_offset: float = 0) -> None:
+        Args:
+            body_name (str): The name of the body. Must be unique in the sim.
+            half_extents (np.ndarray): Half size of the box in meters, as (x, y, z).
+            mass (float): The mass in kg.
+            position (np.ndarray): The position, as (x, y, z).
+            rgba_color (np.ndarray, optional): Body color, as (r, g, b, a). Defaults as [0, 0, 0, 0]
+            specular_color (np.ndarray, optional): Specular color, as (r, g, b). Defaults to [0, 0, 0].
+            ghost (bool, optional): Whether the body can collide. Defaults to False.
+            lateral_friction (float or None, optional): Lateral friction. If None, use the default pybullet
+                value. Defaults to None.
+            spinning_friction (float or None, optional): Spinning friction. If None, use the default pybullet
+                value. Defaults to None.
+            texture (str or None, optional): Texture file name. Defaults to None.
+        """
+        visual_kwargs = {
+            "halfExtents": half_extents,
+            "specularColor": specular_color,
+            "rgbaColor": rgba_color,
+        }
+        collision_kwargs = {"halfExtents": half_extents}
+        return self._create_geometry(
+            body_name,
+            geom_type=self.physics_client.GEOM_BOX,
+            mass=mass,
+            position=position,
+            ghost=ghost,
+            lateral_friction=lateral_friction,
+            spinning_friction=spinning_friction,
+            visual_kwargs=visual_kwargs,
+            collision_kwargs=collision_kwargs,
+        )
+        # if texture is not None:
+        #     texture_path = os.path.join(get_data_path(), texture)
+        #     texture_uid = self.physics_client.loadTexture(texture_path)
+        #     self.physics_client.changeVisualShape(self.bullet._bodies_idx[body_name], -1, textureUniqueId=texture_uid)
+        
+    def create_cylinder(
+        self,
+        body_name: str,
+        radius: float,
+        height: float,
+        mass: float,
+        position: np.ndarray,
+        orientation: None,
+        rgba_color: Optional[np.ndarray] = np.zeros(4),
+        specular_color: np.ndarray = np.zeros(3),
+        ghost: bool = False,
+        lateral_friction: Optional[float] = None,
+        spinning_friction: Optional[float] = None,
+    ) -> Body:
+        """Create a cylinder.
+
+        Args:
+            body_name (str): The name of the body. Must be unique in the sim.
+            radius (float): The radius in meter.
+            height (float): The height in meter.
+            mass (float): The mass in kg.
+            position (np.ndarray): The position, as (x, y, z).
+            rgba_color (np.ndarray, optional): Body color, as (r, g, b, a). Defaults as [0, 0, 0, 0]
+            specular_color (np.ndarray, optional): Specular color, as (r, g, b). Defaults to [0, 0, 0].
+            ghost (bool, optional): Whether the body can collide. Defaults to False.
+            lateral_friction (float or None, optional): Lateral friction. If None, use the default pybullet
+                value. Defaults to None.
+            spinning_friction (float or None, optional): Spinning friction. If None, use the default pybullet
+                value. Defaults to None.
+        """
+        visual_kwargs = {
+            "radius": radius,
+            "length": height,
+            "specularColor": specular_color,
+            "rgbaColor": rgba_color,
+        }
+        collision_kwargs = {"radius": radius, "height": height}
+        return self._create_geometry(
+            body_name,
+            geom_type=self.physics_client.GEOM_CYLINDER,
+            mass=mass,
+            position=position,
+            orientation=orientation,
+            ghost=ghost,
+            lateral_friction=lateral_friction,
+            spinning_friction=spinning_friction,
+            visual_kwargs=visual_kwargs,
+            collision_kwargs=collision_kwargs,
+        )
+
+    def create_sphere(
+        self,
+        body_name: str,
+        radius: float,
+        mass: float,
+        position: np.ndarray,
+        rgba_color: Optional[np.ndarray] = np.zeros(4),
+        specular_color: np.ndarray = np.zeros(3),
+        ghost: bool = False,
+        lateral_friction: Optional[float] = None,
+        spinning_friction: Optional[float] = None,
+    ) -> Body:
+        """Create a sphere.
+
+        Args:
+            body_name (str): The name of the body. Must be unique in the sim.
+            radius (float): The radius in meter.
+            mass (float): The mass in kg.
+            position (np.ndarray): The position, as (x, y, z).
+            rgba_color (np.ndarray, optional): Body color, as (r, g, b, a). Defaults as [0, 0, 0, 0]
+            specular_color (np.ndarray, optional): Specular color, as (r, g, b). Defaults to [0, 0, 0].
+            ghost (bool, optional): Whether the body can collide. Defaults to False.
+            lateral_friction (float or None, optional): Lateral friction. If None, use the default pybullet
+                value. Defaults to None.
+            spinning_friction (float or None, optional): Spinning friction. If None, use the default pybullet
+                value. Defaults to None.
+        """
+        visual_kwargs = {
+            "radius": radius,
+            "specularColor": specular_color,
+            "rgbaColor": rgba_color,
+        }
+        collision_kwargs = {"radius": radius}
+        return self._create_geometry(
+            body_name,
+            geom_type=self.physics_client.GEOM_SPHERE,
+            mass=mass,
+            position=position,
+            ghost=ghost,
+            lateral_friction=lateral_friction,
+            spinning_friction=spinning_friction,
+            visual_kwargs=visual_kwargs,
+            collision_kwargs=collision_kwargs,
+        )
+
+    def create_plane(self, z_offset: float = 0) -> Body:
         """Create a plane. (Actually, it is a thin box.)
 
         Args:
             z_offset (float): Offset of the plane.
         """
         body_name = "plane"
-        self.create_box(
+        return self.create_box(
             body_name=body_name,
             half_extents=np.array([3.0, 3.0, 0.01]),
             mass=0.0,
@@ -220,7 +221,6 @@ class BulletSceneMaker:
             specular_color=np.zeros(3),
             rgba_color=np.array([0.85, 0.85, 0.85, 1.0]),
         )
-        return self.world.bodies[body_name]
 
     def create_table(
         self,
@@ -233,7 +233,7 @@ class BulletSceneMaker:
         z_offset: float = 0.0,
         lateral_friction: Optional[float] = None,
         spinning_friction: Optional[float] = None,
-    ) -> None:
+    ) -> Body:
         """Create a fixed table. Top is z=0, centered in y.
 
         Args:
@@ -246,7 +246,7 @@ class BulletSceneMaker:
             spinning_friction (float or None, optional): Spinning friction. If None, use the default pybullet
                 value. Defaults to None.
         """
-        self.create_box(
+        return self.create_box(
             body_name=body_name,
             half_extents=np.array([length, width, height]) / 2,
             mass=0.0,
@@ -256,7 +256,6 @@ class BulletSceneMaker:
             lateral_friction=lateral_friction,
             spinning_friction=spinning_friction,
         )
-        return self.world.bodies[body_name]
     
     def make_sphere_obstacle(self, name, position, rgb_color=[0.,0.,1.]):
         if not name in self.world.bodies:
@@ -279,7 +278,7 @@ class BulletSceneMaker:
         name: Optional[str] = None, 
         size=0.02, 
         rgb_color=[1.,0.,0.]
-    ):
+    )->None:
         if name is None:
             name = "point"
         if not name in self.world.bodies:
@@ -301,7 +300,7 @@ class BulletSceneMaker:
         pose: Pose, 
         name: Optional[str] = None,
         length: float = 0.05
-    ): #pos, orn
+    )->None: #pos, orn
         if name is None:
             name = "frame"
         if not name in self.world.bodies:
