@@ -310,7 +310,7 @@ class BulletSceneMaker:
         y_orn = p.getQuaternionFromEuler([-np.pi/2, 0, 0])
         z_orn = [0., 0., 0., 1.]
         axis_orn = [x_orn, y_orn, z_orn]
-        pos, orn = pose.translation, pose.rotation.as_quat()
+        pos, orn = pose.trans, pose.rot.as_quat()
         for i, idx in enumerate(self.world.bodies[name]):
             #orn_ = orn * axis_orn[i]
             _, orn_ = p.multiplyTransforms([0,0,0], orn, [0,0,0], axis_orn[i])

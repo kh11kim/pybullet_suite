@@ -27,6 +27,11 @@ class Pose:
 
         self.rot = rot
         self.trans = np.asarray(trans, np.double)
+    
+    def __eq__(self, other:"Pose"):
+        same_rot = np.allclose(self.rot.as_quat(), other.rot.as_quat())
+        same_trans = np.allclose(self.trans, other.trans)
+        return same_rot & same_trans
 
     def as_matrix(self):
         """Represent as a 4x4 matrix."""
