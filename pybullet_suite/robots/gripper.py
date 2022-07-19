@@ -9,6 +9,9 @@ class Gripper:
         self.max_opening_width = 0.08
         self.T_body_tcp = Pose(Rotation.identity(), [0.0, 0.0, 0.103])
         self.T_tcp_body = self.T_body_tcp.inverse()
+        
+        self.remove_pose = Pose(trans=[10,10,10]) * self.T_tcp_body
+        #self.body = self.world.load_urdf(self.name, self.urdf_path, self.remove_pose)
 
     def reset(self, T_world_tcp: Pose, name=None):
         if name is None:
@@ -27,7 +30,8 @@ class Gripper:
         return T_world_body * self.T_body_tcp
 
     def remove(self):
-        self.world.remove_body(name=self.name)
+        self.body.set_base_pose(self.remove_pose)
+        #self.world.remove_body(name=self.name)
 
     def detect_contact(self):
         self.world.step(only_collision_detection=True)
@@ -35,6 +39,12 @@ class Gripper:
             return True
         return False
     
+    def detect_collision(self, obstacles: List[str]):
+        for obs_name in obstacles:
+            if self.world.is_body_pairwise_collision(self.name, obstacles):
+                return True
+        return False
+
     def grip(self, width=None):
         assert self.body is not None
         if width is None:

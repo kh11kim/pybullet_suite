@@ -21,7 +21,7 @@ class Panda(Robot):
         self, 
         pos: np.ndarray = None, 
         pose: Pose = None,
-        tol: float = 1e-4,
+        tol: float = 5e-3,
         max_iter: int = 10
     ):
         assert (pos is None) ^ (pose is None)
@@ -95,6 +95,9 @@ class Panda(Robot):
         if ctrl == False:
             for i in self.finger_idxs:
                 self.set_joint_angle(joint=i, angle=0)
+
+
+
 
 if __name__ == "__main__":
     world = BulletWorld(gui=True)

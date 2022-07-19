@@ -206,17 +206,20 @@ class BulletWorld:
     def get_closest_points(
         self, 
         body1: Body, body2: Body, 
-        link1:int=None, link2:int=None
+        link1:int=None, link2:int=None,
+        d:float=None
     ):
+        if d is None:
+            d = COLLISION_DISTANCE
         if (link1 is not None) & (link2 is not None):
             results = self.physics_client.getClosestPoints(
                 bodyA=body1.uid, bodyB=body2.uid, 
                 linkIndexA=link1, linkIndexB=link2,
-                distance=COLLISION_DISTANCE)
+                distance=d)
         elif (link1 is None) & (link2 is None):
             results = self.physics_client.getClosestPoints(
                 bodyA=body1.uid, bodyB=body2.uid, 
-                distance=COLLISION_DISTANCE)
+                distance=d)
         return [CollisionInfo(*info) for info in results]
     
     def is_body_pairwise_collision(
