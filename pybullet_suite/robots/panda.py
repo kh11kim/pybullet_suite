@@ -22,7 +22,8 @@ class Panda(Robot):
         pos: np.ndarray = None, 
         pose: Pose = None,
         tol: float = 5e-3,
-        max_iter: int = 10
+        max_iter: int = 10,
+        start_central = True
     ):
         assert (pos is None) ^ (pose is None)
         orn = None
@@ -30,6 +31,8 @@ class Panda(Robot):
         if pose is not None:
             pos, orn = pose.trans, pose.rot.as_quat()
         with self.no_set_joint():
+            if start_central:
+                self.set_joint_angles(self.arm_central)
             for i in range(max_iter):
                 joint_angles = self.physics_client.calculateInverseKinematics(
                     bodyIndex=self.uid,
@@ -86,10 +89,14 @@ class Panda(Robot):
         for i, angle in zip(self.arm_idxs, angles):
             super().set_joint_angle(joint=i, angle=angle) 
     
-    def open(self, ctrl=False):
+    def open(self, width:float=None, ctrl=False):
+        if width is None:
+            angle = self.max_opening_width/2
+        else:
+            angle = width/2
         if ctrl == False:
             for i in self.finger_idxs:
-                self.set_joint_angle(joint=i, angle=self.max_opening_width/2)
+                self.set_joint_angle(joint=i, angle=angle)
     
     def close(self, ctrl=False):
         if ctrl == False:

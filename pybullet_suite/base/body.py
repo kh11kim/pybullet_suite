@@ -60,7 +60,7 @@ class Body:
             fileName=viz_path,
             meshScale=np.ones(3)*scale
         )
-        com_orn.as_euler()
+        #com_orn.as_euler()
         col_id = physics_client.createCollisionShape(
             physics_client.GEOM_MESH,
             fileName=col_path,
@@ -69,7 +69,7 @@ class Body:
         body_uid = physics_client.createMultiBody(
             baseCollisionShapeIndex=col_id,
             baseVisualShapeIndex=viz_id,
-            basePosition=pose.t,
+            basePosition=pose.trans,
             baseOrientation=pose.rot.as_quat(),
             baseMass=mesh.mass,
             baseInertialFramePosition=com_pos,
@@ -172,6 +172,24 @@ class Body:
             return center, extent
         return lower, upper
 
+    def get_AABB_wrt_obj_frame(self, output_center_extent=True):
+        #only for base link
+        p = self.physics_client
+        collision_data = p.getCollisionShapeData(
+            self.uid, -1
+        )[0]
+        # geometry_type
+        if collision_data[2] == p.GEOM_BOX:
+            extents = np.array(collision_data[3])
+        center = np.array([0,0,0])
+        if output_center_extent:
+            return center, extents
+        else:
+            half_extents = extents/2
+            lower = center - half_extents
+            upper = center + half_extents
+            return lower, upper
+
     def get_link_velocity(self, link: int):
         raise NotImplementedError("not implemented")
 
@@ -231,6 +249,7 @@ class Body:
         assert len(angles) == self.n_joints
         for i, angle in zip(range(self.n_joints), angles):
             self.set_joint_angle(joint=i, angle=angle)  
+    
     
     # def set_stable_z(self):
     #     _, extent = self.get_AABB(output_center_extent=True)

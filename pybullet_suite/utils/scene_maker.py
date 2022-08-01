@@ -24,6 +24,7 @@ class BulletSceneMaker:
         spinning_friction: Optional[float] = None,
         visual_kwargs: Dict[str, Any] = {},
         collision_kwargs: Dict[str, Any] = {},
+        use_fixed_body: bool = False
     ) -> Body:
         """Create a geometry.
 
@@ -58,6 +59,10 @@ class BulletSceneMaker:
         if spinning_friction is not None:
             self.set_spinning_friction(body=body_name, link=-1, spinning_friction=spinning_friction)
         self.world.register_body(body_name, body)
+        if use_fixed_body:
+            self.physics_client.createConstraint(
+                parentBodyUniqueId
+            )
         return self.world.bodies[body_name]
     
     def create_box(

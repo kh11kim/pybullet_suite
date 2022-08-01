@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import time
 import numpy as np
 from dataclasses import dataclass
@@ -54,6 +55,7 @@ class BulletWorld:
         self.dt = dt
         self._bodies = {}
         self._body_names = {}
+        self.const_id = {}
         options = ""
         if background_color is not None:
             background_color = background_color.astype(np.float64) / 255
@@ -76,6 +78,18 @@ class BulletWorld:
     def body_names(self)->Dict[int, str]:
         return self._body_names
     
+    @contextmanager
+    def no_rendering(self):
+        self.physics_client.configureDebugVisualizer(
+            self.physics_client.COV_ENABLE_RENDERING, 
+            0
+        )
+        yield
+        self.physics_client.configureDebugVisualizer(
+            self.physics_client.COV_ENABLE_RENDERING, 
+            1
+        )
+
     ## ------------------------------------------------------------
     ## Simulation
     ## ------------------------------------------------------------
@@ -223,7 +237,7 @@ class BulletWorld:
         return [CollisionInfo(*info) for info in results]
     
     def is_body_pairwise_collision(
-        self, body: Union[str, Body], obstacles: Union[List[str], List[Body]], **kwargs)->bool:
+        self, body: Union[str, Body], obstacles: Union[List[str], List[Body]], all=False, **kwargs)->bool:
         """Get boolean whether two body is in collision
 
         Args:
@@ -235,10 +249,15 @@ class BulletWorld:
         """
         if isinstance(body, str):
             body = self.bodies[body]
-        if not isinstance(obstacles, List):
-            obstacles = [obstacles]
-        if isinstance(obstacles[0], str):
-            obstacles = [self.bodies[name] for name in obstacles]
+
+        if all:
+            obstacles = [self.bodies[name] for name in self.bodies]
+        else:
+            if not isinstance(obstacles, List):
+                obstacles = [obstacles]
+            if isinstance(obstacles[0], str):
+                obstacles = [self.bodies[name] for name in obstacles]
+        
 
         return any(self.get_closest_points(body, other, **kwargs) \
             for other in obstacles if body.uid != other.uid)
@@ -338,6 +357,21 @@ class BulletWorld:
                 if np.linalg.norm(body.get_base_velocity()) > tol:
                     is_rest = False
                     break
+    
+    def make_fixed_constraint(self, body1: str, body2: str):
+        body1_uid = self.bodies[body1]
+        body2_uid = self.bodies[body2]
+        const_id = self.physics_client.createConstraint(
+            parentBodyUniqueId=body1_uid,
+            parentLinkIndex=-1,
+            childBodyUniqueId=body2_uid,
+            childLinkIndex=-1,
+            jointType=self.physics_client.JOINT_FIXED,
+            jointAxis=[1,0,0]
+        )
+        const_str = f"{body1}_{body2}_fixed"
+        self.const_id[const_str] = const_id
+        
 
 if __name__ == "__main__":
     world = BulletWorld(gui=True)
