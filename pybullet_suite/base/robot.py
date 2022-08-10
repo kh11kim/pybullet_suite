@@ -6,14 +6,16 @@ from pybullet_utils.bullet_client import BulletClient
 from .body import Body
 from .tf import Rotation, Pose
 
+
 class Robot(Body):
     """Actuated body(robot) class.
     """
+
     def __init__(
-        self, 
-        physics_client: BulletClient, 
+        self,
+        physics_client: BulletClient,
         body_uid: int,
-        ee_idx: Optional[int]=None,
+        ee_idx: Optional[int] = None,
     ):
         """Initialize Robot
 
@@ -29,7 +31,7 @@ class Robot(Body):
         self.ee_idx = ee_idx if ee_idx is not None else (self.n_joints - 1)
         self.set_joint_limits()
         self.set_joint_angles(self.joint_central)
-    
+
     def set_joint_limits(self):
         ll_list = []
         ul_list = []
@@ -48,22 +50,77 @@ class Robot(Body):
     def get_ee_pose(self):
         return self.get_link_pose(self.ee_idx)
 
+    def inverse_kinematics(
+        self,
+        pos: np.ndarray = None,
+        pose: Pose = None,
+        tol: float = 1e-3,
+        max_iter: int = 100,
+        start_central=True
+    ):
+        def is_pose_close(pose1: Pose, pose2: Pose, tol: float):
+            if np.linalg.norm(pose1.trans - pose2.trans) > tol:
+                return False
+            if pose1.rot.angle_between(pose2.rot) > tol*np.pi:
+                return False
+            return True
+
+        assert (pos is None) or (pose is None)
+        orn = None
+        success = False
+        if pose is not None:
+            pos, orn = pose.trans, pose.rot.as_quat()
+        with self.no_set_joint():
+            if start_central:
+                self.set_joint_angles(self.arm_central)
+            for _ in range(max_iter):
+                joint_angles = self.physics_client.calculateInverseKinematics(
+                    bodyIndex=self.uid,
+                    endEffectorLinkIndex=self.ee_idx,
+                    targetPosition=pos,
+                    targetOrientation=orn
+                )
+                self.set_joint_angles(joint_angles)
+                pose_curr = self.get_ee_pose()
+                if is_pose_close(pose_curr, pose, tol):
+                    success = True
+                    break
+        if success:
+            return np.array(joint_angles)
+        return None
+
+    def forward_kinematics(
+        self,
+        angles: np.ndarray
+    ):
+        with self.no_set_joint():
+            self.set_joint_angles(angles)
+            pose = self.get_ee_pose()
+        return pose
+
+    def get_jacobian(
+        self,
+        joint_angles: Optional[np.ndarray] = None,
+        local_position: Union[list, np.ndarray] = [0, 0, 0]
+    ):
+        if joint_angles is None:
+            joint_angles = self.get_joint_angles()
+        jac_trans, jac_rot = self.physics_client.calculateJacobian(
+            bodyUniqueId=self.uid,
+            linkIndex=self.ee_idx,
+            localPosition=local_position,
+            objPositions=joint_angles.tolist(),
+            objVelocities=np.zeros_like(joint_angles).tolist(),
+            objAccelerations=np.zeros_like(joint_angles).tolist()
+        )
+        return np.vstack([jac_trans, jac_rot])
+
     @contextmanager
-    def no_set_joint(self, no_viz=False):
-        if no_viz:
-            self.physics_client.configureDebugVisualizer(
-                self.physics_client.COV_ENABLE_RENDERING, 
-                0
-            )
+    def no_set_joint(self):
         joints_temp = self.get_joint_angles()
         yield
         self.set_joint_angles(joints_temp)
-        if no_viz:
-            self.physics_client.configureDebugVisualizer(
-                self.physics_client.COV_ENABLE_RENDERING, 
-                1
-            )
-    
+
     @classmethod
     def make(
         cls,
@@ -78,6 +135,3 @@ class Robot(Body):
             useFixedBase=use_fixed_base,
         )
         return cls(physics_client, body_uid)
-
-
-
