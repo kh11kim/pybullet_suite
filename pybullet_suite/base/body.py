@@ -5,7 +5,7 @@ from typing import Tuple, Optional
 from pybullet_utils.bullet_client import BulletClient
 from .tf import Rotation, Pose
 
-
+# TODO: use dataclass or namedtuple
 JOINT_ATRTIBUTE_NAMES = \
     ["joint_index", "joint_name", "joint_type",
      "q_index", "u_index", "flags",

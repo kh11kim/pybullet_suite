@@ -48,6 +48,11 @@ class Pose:
         same_trans = np.allclose(self.trans, other.trans)
         return same_rot & same_trans
 
+    def __repr__(self):
+        trans = " ".join([f"{i:.3f}" for i in self.trans])
+        rot = " ".join([f"{i:.3f}" for i in self.rot.as_quat()])
+        return f"pose: trans[{trans}]-rot[{rot}]]"
+
     def as_matrix(self):
         """Represent as a 4x4 matrix."""
         return np.vstack(
@@ -157,6 +162,7 @@ def orn_error(desired, current):
 
 
 if __name__ == "__main__":
+    p = Pose(Rotation.random(), np.random.random(3))
     r1 = Rotation.random()
     r2 = Rotation.random()
     result = r1.slerp(r2, 3)

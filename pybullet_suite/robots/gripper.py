@@ -1,5 +1,5 @@
 from ..base import *
-from ...data import *
+from data import *
 
 class Gripper:
     def __init__(self, world: BulletWorld):
