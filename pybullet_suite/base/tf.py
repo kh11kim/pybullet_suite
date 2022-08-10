@@ -2,12 +2,27 @@ import numpy as np
 from typing import Union
 import scipy.spatial.transform
 
+
 class Rotation(scipy.spatial.transform.Rotation):
     """Wrapper of scipy.spatial.transform.Rotation class
     """
     @classmethod
     def identity(cls):
         return cls.from_quat([0.0, 0.0, 0.0, 1.0])
+
+    def inverse(self):
+        return self.inv()
+
+    def angle_between(self, other: "Rotation"):
+        error = self.inverse() * other
+        return error.magnitude()
+
+    def slerp(self, other: "Rotation", num_interp: int):
+        rots = Rotation.concatenate([self, other])
+        ratio = np.linspace(0, 1, num_interp, endpoint=True)
+        interpolator = scipy.spatial.transform.Slerp([0, 1], rots)
+        interp_rots = interpolator(ratio)
+        return [*interp_rots]
 
 
 class Pose:
@@ -19,16 +34,16 @@ class Pose:
     """
 
     def __init__(
-        self, 
-        rot: Rotation = Rotation.identity(), 
-        trans: Union[np.ndarray, list] = [0.,0.,0.]):
+            self,
+            rot: Rotation = Rotation.identity(),
+            trans: Union[np.ndarray, list] = [0., 0., 0.]):
         assert isinstance(rot, scipy.spatial.transform.Rotation)
         assert isinstance(trans, (np.ndarray, list, tuple))
 
         self.rot = rot
         self.trans = np.asarray(trans, np.double)
-    
-    def __eq__(self, other:"Pose"):
+
+    def __eq__(self, other: "Pose"):
         same_rot = np.allclose(self.rot.as_quat(), other.rot.as_quat())
         same_trans = np.allclose(self.trans, other.trans)
         return same_rot & same_trans
@@ -38,7 +53,7 @@ class Pose:
         return np.vstack(
             (np.c_[self.rot.as_matrix(), self.trans], [0.0, 0.0, 0.0, 1.0])
         )
-    
+
     def as_1d_numpy(self):
         """Represet as a 1x7 vector [x,y,z,qx,qy,qz,qw]"""
         return np.hstack([*self.trans, *self.rot.as_quat()])
@@ -114,8 +129,11 @@ class Pose:
         return cls.from_matrix(m).inverse()
 
 # Quaternion functions
+
+
 def qtn_conj(qtn):
     return np.hstack([-qtn[:3], qtn[-1]])
+
 
 def qtn_mul(a, b):
     x1, y1, z1, w1 = a
@@ -131,19 +149,15 @@ def qtn_mul(a, b):
     z = qq - zz + (z1 + y1) * (w2 - x2)
     return np.array([x, y, z, w])
 
+
 def orn_error(desired, current):
     cc = qtn_conj(current)
     q_r = qtn_mul(desired, cc)
     return q_r[:3] * np.sign(q_r[-1])
 
-def slerp(qtn1, qtn2, ratio):
-    if np.allclose(qtn1, qtn2) | np.allclose(qtn1, -qtn2):
-        return qtn1
-    if qtn1 @ qtn2 < 0.:
-        qtn2 = -qtn2
-    theta = np.arccos(qtn1@qtn2)
-    ratio_ = 1. - ratio
-    wa = np.sin(ratio_*theta) / np.sin(theta)
-    wb = np.sin(ratio*theta) / np.sin(theta)
-    qtn = wa*qtn1 + wb*qtn2
-    return qtn/np.linalg.norm(qtn)
+
+if __name__ == "__main__":
+    r1 = Rotation.random()
+    r2 = Rotation.random()
+    result = r1.slerp(r2, 3)
+    print("a")
