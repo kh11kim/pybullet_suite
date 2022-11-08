@@ -1,5 +1,5 @@
 from ..base import *
-from data import *
+from ..utils.utils import HAND_URDF
 
 class Gripper:
     def __init__(self, world: BulletWorld):

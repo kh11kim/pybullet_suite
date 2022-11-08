@@ -1,9 +1,8 @@
 from ..base import *
-from data import PANDA_URDF
-
+from ..utils.utils import PANDA_URDF
 
 class Panda(Robot):
-    urdf_path = PANDA_URDF
+    urdf_path = PANDA_URDF.as_posix()
 
     def __init__(self, physics_client: BulletClient, body_uid: int):
         self.arm_idxs = range(7)

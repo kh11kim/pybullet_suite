@@ -126,9 +126,10 @@ class BulletWorld:
     
     def load_robot(
         self, 
+        robot_class,
         name: str,
         pose: Pose = Pose.identity(),
-        robot_class = Robot
+        
     ):
         assert name not in self.bodies
         assert Robot in robot_class.__bases__
