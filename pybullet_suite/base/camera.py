@@ -9,8 +9,9 @@ class Camera:
         intrinsic: The camera intrinsic parameters.
     """
 
-    def __init__(self, physics_client, intrinsic, near, far):
+    def __init__(self, physics_client, intrinsic, extrinsic, near, far):
         self.intrinsic = intrinsic
+        self.extrinsic = extrinsic #look_at_matrix
         self.near = near
         self.far = far
         self.proj_matrix = _build_projection_matrix(intrinsic, near, far)

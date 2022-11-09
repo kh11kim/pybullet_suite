@@ -106,17 +106,17 @@ class Pose:
         return cls(rotation, translation)
 
     @classmethod
-    def look_at(cls, eye, center, up):
+    def look_at(cls, eye_pos, target_pos, up):
         """Initialize with a LookAt matrix.
 
         Returns:
             T_eye_ref, the transform from camera to the reference frame, w.r.t.
             which the input arguments were defined.
         """
-        eye = np.asarray(eye)
-        center = np.asarray(center)
+        eyeye_pose = np.asarray(eye_pos)
+        target_pos = np.asarray(target_pos)
 
-        forward = center - eye
+        forward = target_pos - eye_pos
         forward /= np.linalg.norm(forward)
 
         right = np.cross(forward, up)
@@ -129,7 +129,7 @@ class Pose:
         m[:3, 0] = right
         m[:3, 1] = -up
         m[:3, 2] = forward
-        m[:3, 3] = eye
+        m[:3, 3] = eye_pos
 
         return cls.from_matrix(m).inverse()
 

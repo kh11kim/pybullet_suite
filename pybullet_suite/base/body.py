@@ -46,36 +46,41 @@ class Body:
     @classmethod
     def from_mesh(
         cls,
-        physics_client,
+        physics_client:BulletClient,
         col_path: str,
         viz_path: str,
         pose: Pose = Pose.identity(),
-        mass: Optional[float] = 0.1,
+        offset_pose: Pose = Pose.identity(),
+        mass: Optional[float] = None,
         scale: float = 1.0,
     ) -> "Body":
-        mesh = trimesh.load(viz_path)
-        tf = Pose.from_matrix(mesh.principal_inertia_transform.copy())
-        com_pos = mesh.center_mass
-        com_orn = tf.rot
+        #mesh = trimesh.load(viz_path)
+        #tf = Pose.from_matrix(mesh.principal_inertia_transform.copy())
+        # com_pos = mesh.center_mass
+        # com_orn = tf.rot
         viz_id = physics_client.createVisualShape(
             physics_client.GEOM_MESH,
             fileName=viz_path,
-            meshScale=np.ones(3)*scale
+            meshScale=np.ones(3)*scale,
+            visualFramePosition=offset_pose.trans,
+            visualFrameOrientation=offset_pose.rot.as_quat()
         )
         # com_orn.as_euler()
         col_id = physics_client.createCollisionShape(
             physics_client.GEOM_MESH,
             fileName=col_path,
-            meshScale=np.ones(3)*scale
+            meshScale=np.ones(3)*scale,
+            collisionFramePosition=offset_pose.trans,
+            collisionFrameOrientation=offset_pose.rot.as_quat()
         )
         body_uid = physics_client.createMultiBody(
             baseCollisionShapeIndex=col_id,
             baseVisualShapeIndex=viz_id,
             basePosition=pose.trans,
             baseOrientation=pose.rot.as_quat(),
-            baseMass=mesh.mass,
-            baseInertialFramePosition=com_pos,
-            baseInertialFrameOrientation=com_orn
+            baseMass=mass,
+            baseInertialFramePosition=offset_pose.trans,
+            baseInertialFrameOrientation=offset_pose.rot.as_quat()
         )
         return cls(physics_client, body_uid)
 

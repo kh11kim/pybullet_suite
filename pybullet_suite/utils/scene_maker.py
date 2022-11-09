@@ -308,15 +308,15 @@ class BulletSceneMaker:
     )->None: #pos, orn
         if name is None:
             name = "frame"
-        if not name in self.world.bodies:
-            self.world.bodies[name] = self._make_axes(length=length)
+        if not name in self.world.frames:
+            self.world.frames[name] = self._make_axes(length=length)
 
         x_orn = p.getQuaternionFromEuler([0., np.pi/2, 0])
         y_orn = p.getQuaternionFromEuler([-np.pi/2, 0, 0])
         z_orn = [0., 0., 0., 1.]
         axis_orn = [x_orn, y_orn, z_orn]
         pos, orn = pose.trans, pose.rot.as_quat()
-        for i, idx in enumerate(self.world.bodies[name]):
+        for i, idx in enumerate(self.world.frames[name]):
             #orn_ = orn * axis_orn[i]
             _, orn_ = p.multiplyTransforms([0,0,0], orn, [0,0,0], axis_orn[i])
             #(orientation@axis_orn[i]).to_qtn()

@@ -54,6 +54,7 @@ class BulletWorld:
         self.gui = gui
         self.dt = dt
         self._bodies = {}
+        self._frames = {}
         self._body_names = {}
         self.const_id = {}
         options = ""
@@ -69,10 +70,15 @@ class BulletWorld:
             options=options
         )
         self.reset()
+        self.set_gravity([0,0,-9.8])
     
     @property
     def bodies(self)->Dict[str, Body]:
         return self._bodies
+
+    @property
+    def frames(self)->Dict[str, Body]:
+        return self._frames
 
     @property
     def body_names(self)->Dict[int, str]:
@@ -182,6 +188,26 @@ class BulletWorld:
         self.register_body(name, body)
         return body
     
+    def load_mesh(
+        self,
+        name: str,
+        viz_path: str,
+        col_path: str,
+        pose: Pose,
+        mass=0.01,
+        mesh_scale=1,
+    ):
+        body = Body.from_mesh(
+            physics_client=self.physics_client, 
+            col_path=col_path, 
+            viz_path=viz_path,
+            pose=pose,
+            mass=mass,
+            scale=mesh_scale
+        )
+        self.register_body(name, body)
+        return body
+    
     def register_body(self, name: str, body: Body):
         self.bodies[name] = body
         self.body_names[body.uid] = name
@@ -203,7 +229,7 @@ class BulletWorld:
     #     pass
     #     #TODO
 
-    def add_camera(self, intrinsic: CameraIntrinsic, near: float, far: float):
+    def add_camera(self, intrinsic: CameraIntrinsic, extrinsic: Pose, near: float, far: float):
         """Add camera to the world
 
         Args:
@@ -214,7 +240,7 @@ class BulletWorld:
         Returns:
             Camera: camera class
         """
-        camera = Camera(self.physics_client, intrinsic, near, far)
+        camera = Camera(self.physics_client, intrinsic, extrinsic, near, far)
         return camera
     
     #---------------collision detection----------------------
