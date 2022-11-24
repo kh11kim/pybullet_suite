@@ -61,15 +61,18 @@ class Panda(Robot):
     def get_jacobian(
         self,
         joint_angles: Optional[np.ndarray] = None,
+        link_idx=None,
         local_position: Union[list, np.ndarray] = [0, 0, 0]
     ):
+        if link_idx is None:
+            link_idx = self.ee_idx
         if joint_angles is None:
             joint_angles = self.get_joint_angles()
 
         assert len(self.arm_idxs) == len(joint_angles)
         joint_angles = np.asarray([*joint_angles, 0, 0])
 
-        return super().get_jacobian(joint_angles, local_position)[:, :-2]
+        return super().get_jacobian(link_idx, joint_angles, local_position)[:, :-2]
 
 
 if __name__ == "__main__":

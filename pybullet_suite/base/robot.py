@@ -64,6 +64,10 @@ class Robot(Body):
             if pose1.rot.angle_between(pose2.rot) > tol*np.pi:
                 return False
             return True
+        def is_pos_close(pose1, pos, tol):
+            if np.linalg.norm(pose1.trans - pos) > tol:
+                return False
+            return True
 
         assert (pos is None) or (pose is None)
         orn = None
@@ -82,9 +86,14 @@ class Robot(Body):
                 )
                 self.set_joint_angles(joint_angles)
                 pose_curr = self.get_ee_pose()
-                if is_pose_close(pose_curr, pose, tol):
-                    success = True
-                    break
+                if pos is None:
+                    if is_pose_close(pose_curr, pose, tol):
+                        success = True
+                        break
+                else:
+                    if is_pos_close(pose_curr, pos, tol):
+                        success = True
+                        break
         if success:
             return np.array(joint_angles)
         return None
@@ -100,20 +109,25 @@ class Robot(Body):
 
     def get_jacobian(
         self,
+        link_idx=None,
         joint_angles: Optional[np.ndarray] = None,
         local_position: Union[list, np.ndarray] = [0, 0, 0]
     ):
+        if link_idx is None:
+            link_idx = self.ee_idx
         if joint_angles is None:
             joint_angles = self.get_joint_angles()
         jac_trans, jac_rot = self.physics_client.calculateJacobian(
             bodyUniqueId=self.uid,
-            linkIndex=self.ee_idx,
+            linkIndex=link_idx,
             localPosition=local_position,
             objPositions=joint_angles.tolist(),
             objVelocities=np.zeros_like(joint_angles).tolist(),
             objAccelerations=np.zeros_like(joint_angles).tolist()
         )
         return np.vstack([jac_trans, jac_rot])
+    
+    
 
     @contextmanager
     def no_set_joint(self):
@@ -126,7 +140,8 @@ class Robot(Body):
         cls,
         physics_client: BulletClient,
         pose: Pose = Pose.identity(),
-        use_fixed_base: bool = True
+        use_fixed_base: bool = True,
+        
     ):
         body_uid = physics_client.loadURDF(
             cls.urdf_path,

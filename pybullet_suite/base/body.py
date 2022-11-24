@@ -53,6 +53,7 @@ class Body:
         offset_pose: Pose = Pose.identity(),
         mass: Optional[float] = None,
         scale: float = 1.0,
+        rgba_color: Optional[list] = None,
     ) -> "Body":
         #mesh = trimesh.load(viz_path)
         #tf = Pose.from_matrix(mesh.principal_inertia_transform.copy())
@@ -63,7 +64,8 @@ class Body:
             fileName=viz_path,
             meshScale=np.ones(3)*scale,
             visualFramePosition=offset_pose.trans,
-            visualFrameOrientation=offset_pose.rot.as_quat()
+            visualFrameOrientation=offset_pose.rot.as_quat(),
+            rgbaColor=rgba_color
         )
         # com_orn.as_euler()
         col_id = physics_client.createCollisionShape(

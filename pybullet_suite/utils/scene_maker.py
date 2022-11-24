@@ -304,12 +304,13 @@ class BulletSceneMaker:
         self, 
         pose: Pose, 
         name: Optional[str] = None,
-        length: float = 0.05
+        length: float = 0.05,
+        radius: float = 0.003
     )->None: #pos, orn
         if name is None:
             name = "frame"
         if not name in self.world.frames:
-            self.world.frames[name] = self._make_axes(length=length)
+            self.world.frames[name] = self._make_axes(length=length, radius=radius)
 
         x_orn = p.getQuaternionFromEuler([0., np.pi/2, 0])
         y_orn = p.getQuaternionFromEuler([-np.pi/2, 0, 0])
@@ -323,12 +324,40 @@ class BulletSceneMaker:
             self.physics_client.resetBasePositionAndOrientation(
                 bodyUniqueId=idx, posObj=pos, ornObj=orn_
             )
+    
+    def view_arrow(
+        self, 
+        point1: np.ndarray, 
+        point2: np.ndarray,
+        name: Optional[str] = None,
+        radius: float=0.005,
+        rgb_color=[1.,1.,1.],
+    ) -> None: #pos, orn
+        point1 = np.array(point1)
+        point2 = np.array(point2)
+        if name is None:
+            name = "arrow"
+        if name in self.world.frames:
+            world.remove_body(name)
+        length = np.linalg.norm(point2 - point1)
+        pos = (point2 + point1)/2
+        zaxis = point2 - point1
+        zaxis = zaxis/np.linalg.norm(zaxis)
+        xaxis = np.array([1,0,0])
+        if np.allclose(zaxis, xaxis):
+            xaxis = np.array([0,1,0])
+        yaxis = np.cross(zaxis, xaxis)
+        rot_mat = np.vstack([xaxis, yaxis, zaxis]).T
+        qtn = Rotation.from_matrix(rot_mat).as_quat()
+        self.world.frames[name] = self.create_cylinder(
+            name, radius, length, 0.01, pos, qtn, 
+            rgba_color=[*rgb_color, 0.8], ghost=True)
 
     def _make_axes(
         self,
-        length=0.05
+        length=0.05,
+        radius=0.004
     ):
-        radius = length/12
         visualFramePosition = [0,0,length/2]
         r, g, b = np.eye(3)
         orns = [

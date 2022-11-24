@@ -27,7 +27,7 @@ class Contact:
     force: float
 
 @dataclass
-class CollisionInfo:
+class DistanceInfo:
     contact_flag: bool
     bodyA: int
     bodyB: int
@@ -68,6 +68,10 @@ class BulletWorld:
         self.physics_client = BulletClient(
             connection_mode=connection_mode,
             options=options
+        )
+        self.physics_client.configureDebugVisualizer(
+            self.physics_client.COV_ENABLE_GUI, 
+            0
         )
         self.reset()
         self.set_gravity([0,0,-9.8])
@@ -196,6 +200,7 @@ class BulletWorld:
         pose: Pose,
         mass=0.01,
         mesh_scale=1,
+        rgba_color=None,
     ):
         body = Body.from_mesh(
             physics_client=self.physics_client, 
@@ -203,7 +208,8 @@ class BulletWorld:
             viz_path=viz_path,
             pose=pose,
             mass=mass,
-            scale=mesh_scale
+            scale=mesh_scale,
+            rgba_color=rgba_color
         )
         self.register_body(name, body)
         return body
@@ -261,8 +267,35 @@ class BulletWorld:
             results = self.physics_client.getClosestPoints(
                 bodyA=body1.uid, bodyB=body2.uid, 
                 distance=d)
-        return [CollisionInfo(*info) for info in results]
+        return [DistanceInfo(*info) for info in results]
     
+    def get_body_pairwise_distance(
+        self, body: Union[str, Body], obstacles: Union[List[str], List[Body]], all=False, **kwargs)->bool:
+        """Get boolean whether two body is in collision
+
+        Args:
+            body (Union[str, Body]): target body
+            obstacles (Union[List[str], List[Body]]): a list of obstacles. One body is also available.
+
+        Returns:
+            bool: True if the body has a collision with obstacles
+        """
+        if isinstance(body, str):
+            body = self.bodies[body]
+
+        if all:
+            obstacles = [self.bodies[name] for name in self.bodies]
+        else:
+            if not isinstance(obstacles, List):
+                obstacles = [obstacles]
+            if isinstance(obstacles[0], str):
+                obstacles = [self.bodies[name] for name in obstacles]
+        collisions = []
+        for other in obstacles:
+            if body.uid != other.uid:
+                collisions += [*self.get_closest_points(body, other, **kwargs)]
+        return collisions
+
     def is_body_pairwise_collision(
         self, body: Union[str, Body], obstacles: Union[List[str], List[Body]], all=False, **kwargs)->bool:
         """Get boolean whether two body is in collision
@@ -306,6 +339,25 @@ class BulletWorld:
         if point:
             return True
         return False
+    
+    def get_link_pairwise_collision(
+        self, 
+        body1: Union[str, Body], 
+        body2: Union[str, Body],
+        link1: int,
+        link2: int,
+        d: float=0.0
+    ):
+        if isinstance(body1, str):
+            body1 = self.bodies[str]
+        if isinstance(body1, str):
+            body2 = self.bodies[str]
+        point = self.get_closest_points(
+            body1=body1, body2=body2, 
+            link1=link1, link2=link2, d=d)
+        if point:
+            return point[0]
+        return None
 
     def is_self_collision(self, robot: Union[str, Robot])-> bool:
         """Get boolean whether the robot is in self-collision
@@ -328,6 +380,18 @@ class BulletWorld:
                     return True
         return False
                 
+    def get_body_pairwise_contacts(
+        self,
+        body1: Union[str, Body],
+        body2: Union[str, Body],
+    ):
+        if isinstance(body1, str):
+            body1 = self.bodies[body1]
+        if isinstance(body2, str):
+            body2 = self.bodies[body2]
+        
+        points = self.physics_client.getContactPoints(body1.uid, body2.uid)
+        return points
 
     def get_contacts(
         self, 
@@ -398,7 +462,14 @@ class BulletWorld:
         )
         const_str = f"{body1}_{body2}_fixed"
         self.const_id[const_str] = const_id
-        
+    
+    def watch_workspace(self, target_pos, distance = 1.0, cam_yaw=20, cam_pitch=-10):
+        self.physics_client.resetDebugVisualizerCamera(
+            cameraDistance=distance,
+            cameraYaw=cam_yaw,
+            cameraPitch=cam_pitch,
+            cameraTargetPosition=target_pos
+        )
 
 if __name__ == "__main__":
     world = BulletWorld(gui=True)
