@@ -48,11 +48,13 @@ class BulletWorld:
     def __init__(
         self,
         gui: bool = False,
-        dt = 1.0 / 240.0,
+        dt = 1.0 / 1000.0,
+        dt_gui = 1.0/100.,
         background_color = None
     ):
         self.gui = gui
         self.dt = dt
+        self.dt_gui = dt_gui
         self._bodies = {}
         self._frames = {}
         self._body_names = {}
@@ -65,10 +67,12 @@ class BulletWorld:
                         --background_color_blue={background_color[2]}"
         
         connection_mode = p.GUI if gui else p.DIRECT
+        
         self.physics_client = BulletClient(
             connection_mode=connection_mode,
             options=options
         )
+        self.physics_client.setTimeStep(self.dt)
         self.physics_client.configureDebugVisualizer(
             self.physics_client.COV_ENABLE_GUI, 
             0
@@ -112,14 +116,16 @@ class BulletWorld:
         self._bodies = {}
         self._body_names = {}
         self.sim_time = 0.0
-    
+        self.last_render_time = 0.0
+
     def step(self, only_collision_detection=False):
         if only_collision_detection:
             self.physics_client.performCollisionDetection()
         else:
             self.physics_client.stepSimulation()
-        if self.gui:
+        if self.gui: #and (self.sim_time - self.last_render_time) > self.dt_gui:
             time.sleep(self.dt)
+            #self.last_render_time += self.dt_gui
         self.sim_time += self.dt
     
     def save_state(self):

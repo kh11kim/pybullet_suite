@@ -238,6 +238,18 @@ class Body:
         assert self.n_joints > 0, "This body has no joint index"
         return np.asarray(self.physics_client.getJointState(self.uid, joint)[1])
 
+    def get_joint_velocities(self) -> np.ndarray:
+        """Get all joint angles of the body
+
+        Returns:
+            np.ndarray: all joint angles of the body
+        """
+        assert self.n_joints > 0, "This body has no joint index"
+        joint_velocities = []
+        for i in range(self.n_joints):
+            joint_velocities.append(self.get_joint_angle(i))
+        return np.asarray(joint_velocities)
+
     def set_joint_angle(self, joint: int, angle: float):
         """Set a joint angle of the body
 

@@ -6,5 +6,5 @@ setup(
    description='Pybullet wrapper for easy use',
    author='Kanghyun Kim',
    author_email='kh11kim@kaist.ac.kr',
-   packages=find_packages(exclude=["numpy", "scipy", "pybullet", "trimesh"]),  #same as name
+   packages=find_packages(),  #same as name
 )

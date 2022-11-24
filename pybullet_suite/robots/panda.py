@@ -17,18 +17,59 @@ class Panda(Robot):
         self.arm_upper_limit = self.joint_upper_limit[self.arm_idxs]
         self.arm_central = (self.arm_lower_limit + self.arm_upper_limit)/2
         self.open()
+        self.ctrl_mode = "pos" # ["pos", "vel", "torque"] 
 
     def get_joint_angles(self):
         return super().get_joint_angles()[self.arm_idxs]
+    
+    def get_joint_velocities(self):
+        return super().get_joint_velocities()[self.arm_idxs]
 
     def get_random_arm_angles(self):
         q = np.random.uniform(low=self.arm_lower_limit,
                               high=self.arm_upper_limit)
         return q
 
+    def set_ctrl_mode(self, mode):
+        if mode == "torque":
+            self.physics_client.setJointMotorControlArray(
+                self.uid, 
+                jointIndices=list(self.arm_idxs), 
+                controlMode=self.physics_client.VELOCITY_CONTROL, 
+                forces=np.zeros(len(self.arm_idxs))
+            )
+
     def set_joint_angles(self, angles: np.ndarray):
         for i, angle in zip(self.arm_idxs, angles):
             super().set_joint_angle(joint=i, angle=angle)
+    
+    def set_joint_torques(self, torques: np.ndarray, gravity_comp=True):
+        torques = np.hstack([torques,])
+        if gravity_comp == True:
+            states = self.physics_client.getJointStates(
+                self.uid,
+                jointIndices=list(range(self.n_joints)),
+            )
+            all_joint_types = [self.info[i]["joint_type"] for i in list(self.info)]
+            free_joints = [i for i, j in enumerate(all_joint_types) if j != 4]
+            q, qdot, qddot = [], [], []
+            for j in free_joints:
+                q.append(states[j][0])
+                qdot.append(states[j][1])
+                qddot.append(0.)
+
+            comp_torque = self.physics_client.calculateInverseDynamics(
+                self.uid, 
+                q, qdot, qddot
+            )[:-2]
+            torques = torques + comp_torque
+
+        self.physics_client.setJointMotorControlArray(
+            self.uid, 
+            jointIndices=list(self.arm_idxs), 
+            controlMode=self.physics_client.TORQUE_CONTROL, 
+            forces=torques
+        )
 
     def open(self, width: float = None, ctrl=False):
         if width is None:
