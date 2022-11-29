@@ -247,7 +247,7 @@ class Body:
         assert self.n_joints > 0, "This body has no joint index"
         joint_velocities = []
         for i in range(self.n_joints):
-            joint_velocities.append(self.get_joint_angle(i))
+            joint_velocities.append(self.get_joint_velocity(i))
         return np.asarray(joint_velocities)
 
     def set_joint_angle(self, joint: int, angle: float):
