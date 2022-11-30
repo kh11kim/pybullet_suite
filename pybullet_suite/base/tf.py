@@ -99,7 +99,7 @@ class Pose:
         return cls(rotation, translation)
 
     @classmethod
-    def from_rotvec_transvec(cls, rvec, tvec):
+    def from_rvec_tvec(cls, rvec, tvec):
         rot = Rotation.from_rotvec(rvec)
         trans = tvec
         return cls(rot, trans)
