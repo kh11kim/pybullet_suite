@@ -99,6 +99,12 @@ class Pose:
         return cls(rotation, translation)
 
     @classmethod
+    def from_rotvec_transvec(cls, rvec, tvec):
+        rot = Rotation.from_rotvec(rvec)
+        trans = tvec
+        return cls(rot, trans)
+
+    @classmethod
     def identity(cls):
         """Initialize with the identity transformation."""
         rotation = Rotation.from_quat([0.0, 0.0, 0.0, 1.0])

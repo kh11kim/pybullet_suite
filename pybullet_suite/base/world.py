@@ -75,10 +75,6 @@ class BulletWorld:
                 options=options
             )
         self.physics_client.setTimeStep(self.dt)
-        self.physics_client.configureDebugVisualizer(
-            self.physics_client.COV_ENABLE_GUI, 
-            0
-        )
         self.reset()
         self.set_gravity([0,0,-9.8])
     
