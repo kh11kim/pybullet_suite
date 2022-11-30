@@ -22,8 +22,13 @@ class Rotation(scipy.spatial.transform.Rotation):
         ratio = np.linspace(0, 1, num_interp, endpoint=True)
         interpolator = scipy.spatial.transform.Slerp([0, 1], rots)
         interp_rots = interpolator(ratio)
-        return [*interp_rots]
+        return [Rotation.from_rotation_class(rot) for rot in interp_rots]
 
+    @classmethod
+    def from_rotation_class(cls, rotation):
+        rot = cls()
+        rot.__dict__ = rotation.__dict__.copy()
+        return rot
 
 class Pose:
     """Rigid spatial transform between coordinate systems in 3D space.
@@ -138,6 +143,14 @@ class Pose:
         m[:3, 3] = eye_pos
 
         return cls.from_matrix(m).inverse()
+    
+    def slerp(self, other: "Pose", num_interp: int):
+        interp_rots = self.rot.slerp(other.rot, num_interp)
+        interp_trans = np.linspace(self.trans, other.trans, num_interp)
+        #interp_poses = []
+        #for rot, trans in zip(interp_rots, interp_trans):
+        interp_poses = [Pose(rot, trans) for rot, trans in zip(interp_rots, interp_trans)]
+        return interp_poses
 
 # Quaternion functions
 
