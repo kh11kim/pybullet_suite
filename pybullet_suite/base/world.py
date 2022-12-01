@@ -13,6 +13,7 @@ from .body import Body
 from .camera import Camera, CameraIntrinsic
 from .tf import Rotation, Pose
 from .robot import Robot
+from .util import no_output
 
 SOLVER_ITERATIONS = 150
 COLLISION_DISTANCE = 0.
@@ -68,15 +69,12 @@ class BulletWorld:
         
         connection_mode = p.GUI if gui else p.DIRECT
         
-        self.physics_client = BulletClient(
-            connection_mode=connection_mode,
-            options=options
-        )
+        with no_output():
+            self.physics_client = BulletClient(
+                connection_mode=connection_mode,
+                options=options
+            )
         self.physics_client.setTimeStep(self.dt)
-        self.physics_client.configureDebugVisualizer(
-            self.physics_client.COV_ENABLE_GUI, 
-            0
-        )
         self.reset()
         self.set_gravity([0,0,-9.8])
     
