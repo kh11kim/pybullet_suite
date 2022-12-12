@@ -16,15 +16,15 @@ class BulletSceneMaker:
         self,
         body_name: str,
         geom_type: int,
+        pose: Pose,
         mass: float = 0.0,
-        position: np.ndarray = np.zeros(3),
-        orientation = None,
         ghost: bool = False,
         lateral_friction: Optional[float] = None,
         spinning_friction: Optional[float] = None,
         visual_kwargs: Dict[str, Any] = {},
         collision_kwargs: Dict[str, Any] = {},
-        use_fixed_body: bool = False
+        use_fixed_body: bool = False,
+        register=True,
     ) -> Body:
         """Create a geometry.
 
@@ -50,33 +50,37 @@ class BulletSceneMaker:
             baseVisualShapeIndex=baseVisualShapeIndex,
             baseCollisionShapeIndex=baseCollisionShapeIndex,
             baseMass=mass,
-            basePosition=position,
-            baseOrientation=orientation,
+            basePosition=pose.trans,
+            baseOrientation=pose.rot.as_quat(),
         )
-        body = Body(self.physics_client, uid)
+        body = Body(self.physics_client, uid, body_name)
         if lateral_friction is not None:
             self.set_lateral_friction(body=body_name, link=-1, lateral_friction=lateral_friction)
         if spinning_friction is not None:
             self.set_spinning_friction(body=body_name, link=-1, spinning_friction=spinning_friction)
-        self.world.register_body(body_name, body)
+        
         if use_fixed_body:
             self.physics_client.createConstraint(
                 parentBodyUniqueId
             )
-        return self.world.bodies[body_name]
+        if register:
+            self.world.register_body(body_name, body)
+        return body
+        
     
     def create_box(
         self,
         body_name: str,
         half_extents: np.ndarray,
         mass: float,
-        position: np.ndarray,
+        pose: Pose,
         rgba_color: Optional[np.ndarray] = np.ones(4),
         specular_color: np.ndarray = np.zeros(3),
         ghost: bool = False,
         lateral_friction: Optional[float] = None,
         spinning_friction: Optional[float] = None,
         texture: Optional[str] = None,
+        register=True
     ) -> Body:
         """Create a box.
 
@@ -104,12 +108,13 @@ class BulletSceneMaker:
             body_name,
             geom_type=self.physics_client.GEOM_BOX,
             mass=mass,
-            position=position,
+            pose=pose,
             ghost=ghost,
             lateral_friction=lateral_friction,
             spinning_friction=spinning_friction,
             visual_kwargs=visual_kwargs,
             collision_kwargs=collision_kwargs,
+            register=register
         )
         # if texture is not None:
         #     texture_path = os.path.join(get_data_path(), texture)
@@ -171,7 +176,7 @@ class BulletSceneMaker:
         body_name: str,
         radius: float,
         mass: float,
-        position: np.ndarray,
+        pose: Pose,
         rgba_color: Optional[np.ndarray] = np.zeros(4),
         specular_color: np.ndarray = np.zeros(3),
         ghost: bool = False,
@@ -203,7 +208,7 @@ class BulletSceneMaker:
             body_name,
             geom_type=self.physics_client.GEOM_SPHERE,
             mass=mass,
-            position=position,
+            pose=pose,
             ghost=ghost,
             lateral_friction=lateral_friction,
             spinning_friction=spinning_friction,
@@ -292,7 +297,7 @@ class BulletSceneMaker:
                 radius=size,
                 mass=0.0,
                 ghost=True,
-                position=position,
+                pose=Pose(rot=Rotation.identity(), trans=position),
                 rgba_color=np.array([*rgb_color, 0.3]),
             )
         else:
@@ -318,13 +323,53 @@ class BulletSceneMaker:
         axis_orn = [x_orn, y_orn, z_orn]
         pos, orn = pose.trans, pose.rot.as_quat()
         for i, idx in enumerate(self.world.frames[name]):
-            #orn_ = orn * axis_orn[i]
             _, orn_ = p.multiplyTransforms([0,0,0], orn, [0,0,0], axis_orn[i])
-            #(orientation@axis_orn[i]).to_qtn()
             self.physics_client.resetBasePositionAndOrientation(
                 bodyUniqueId=idx, posObj=pos, ornObj=orn_
             )
     
+    def remove_frame(
+        self,
+        name,
+    ):
+        axes = self.world.frames.pop(name, None)
+        for axis in axes:
+            self.world.physics_client.removeBody(axis)
+    
+    def view_grasp(
+        self,
+        grasp_pose: Pose,
+        name: str,
+        only_arm= False,
+    ):
+        w = 0.0085
+        width = 0.08
+        depth = 0.04
+        arm_length = 0.08
+        T_tcp_finger1 = grasp_pose * Pose(trans=[0,-width/2, -depth/2])
+        T_tcp_finger2 = grasp_pose * Pose(trans=[0, width/2,  -depth/2])
+        T_tcp_bar = grasp_pose * Pose(trans=[0, 0, -depth])
+        T_tcp_arm = grasp_pose * Pose(trans=[0, 0, -depth -arm_length/2])
+        T_list = [T_tcp_finger1, T_tcp_finger2, T_tcp_bar, T_tcp_arm]
+        if not name in self.world.frames:
+            #draw gripper
+            if not only_arm:
+                finger1 = self.create_box(name+"finger1", [w/2, w/2, 0.02], 0.01, T_tcp_finger1, [0,0,1,0.4], ghost=True, register=False)
+                finger2 = self.create_box(name+"finger2", [w/2, w/2, 0.02], 0.01, T_tcp_finger2, [0,0,1,0.4], ghost=True, register=False)
+                bar = self.create_box(name+"bar", [w/2, width/2, w/2], 0.01, T_tcp_bar, [0,0,1,0.4], ghost=True, register=False)
+                arm = self.create_box(name+"arm", [w/2, w/2, arm_length/2], 0.01, T_tcp_arm, [0,0,1,0.4], ghost=True, register=False)
+                gripper = [finger1, finger2, bar, arm]
+            else:
+                arm = self.create_box(name+"arm", [w/2, w/2, arm_length/2], 0.01, T_tcp_arm, [0,0,1,0.4], ghost=True, register=False)
+                gripper = [arm]
+            self.world.frames[name] = [body.uid for body in gripper]
+        else:
+            for uid, T in zip(self.world.frames[name], T_list):
+                self.physics_client.resetBasePositionAndOrientation(
+                    bodyUniqueId=uid, posObj=T.trans, ornObj=T.rot.as_quat()
+                )
+
+
     def view_arrow(
         self, 
         point1: np.ndarray, 

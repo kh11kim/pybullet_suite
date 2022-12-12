@@ -9,9 +9,8 @@ class Camera:
         intrinsic: The camera intrinsic parameters.
     """
 
-    def __init__(self, physics_client, intrinsic, extrinsic, near, far):
+    def __init__(self, physics_client, intrinsic, near, far):
         self.intrinsic = intrinsic
-        self.extrinsic = extrinsic #look_at_matrix
         self.near = near
         self.far = far
         self.proj_matrix = _build_projection_matrix(intrinsic, near, far)
@@ -37,8 +36,10 @@ class Camera:
             projectionMatrix=gl_proj_matrix,
             renderer=p.ER_TINY_RENDERER,
         )
-
-        rgb, z_buffer = result[2][:, :, :3], result[3]
+        width, height = self.intrinsic.width, self.intrinsic.height #result[0], result[1]
+        rgb = np.reshape(result[2], (height, width, 4))[:,:,:3] * 1. / 255.
+        z_buffer = np.array(result[3]).reshape(height,-1) #np.reshape(result[3], [width, height])
+        
         depth = (
             1.0 * self.far * self.near / (self.far - (self.far - self.near) * z_buffer)
         )
