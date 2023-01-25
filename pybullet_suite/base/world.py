@@ -69,11 +69,11 @@ class BulletWorld:
         
         connection_mode = p.GUI if gui else p.DIRECT
         
-        with no_output():
-            self.physics_client = BulletClient(
-                connection_mode=connection_mode,
-                options=options
-            )
+        #with no_output():
+        self.physics_client = BulletClient(
+            connection_mode=connection_mode,
+            options=options
+        )
         self.physics_client.setTimeStep(self.dt)
         self.reset()
         self.set_gravity([0,0,-9.8])
@@ -121,8 +121,8 @@ class BulletWorld:
             self.physics_client.performCollisionDetection()
         else:
             self.physics_client.stepSimulation()
-        if self.gui: #and (self.sim_time - self.last_render_time) > self.dt_gui:
-            time.sleep(self.dt)
+        #if self.gui: #and (self.sim_time - self.last_render_time) > self.dt_gui:
+            #time.sleep(self.dt_gui)
             #self.last_render_time += self.dt_gui
         self.sim_time += self.dt
     
