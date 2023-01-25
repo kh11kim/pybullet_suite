@@ -26,7 +26,7 @@ class Rotation(scipy.spatial.transform.Rotation):
 
     @classmethod
     def from_rotation_class(cls, rotation):
-        rot = cls()
+        rot = cls(rotation.as_quat())
         rot.__dict__ = rotation.__dict__.copy()
         return rot
 

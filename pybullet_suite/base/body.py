@@ -15,9 +15,10 @@ JOINT_ATRTIBUTE_NAMES = \
 
 
 class Body:
-    def __init__(self, physics_client: BulletClient, body_uid: int):
+    def __init__(self, physics_client: BulletClient, body_uid: int, name:str):
         self.physics_client = physics_client
         self.uid = body_uid
+        self.name = name
         self.info = {}
         self.n_joints = self.physics_client.getNumJoints(self.uid)
         for i in range(self.n_joints):
@@ -29,6 +30,7 @@ class Body:
     def from_urdf(
         cls,
         physics_client: BulletClient,
+        name:str, 
         urdf_path: str,
         pose: Pose = Pose.identity(),
         use_fixed_base: bool = False,
@@ -41,12 +43,13 @@ class Body:
             useFixedBase=use_fixed_base,
             globalScaling=scale,
         )
-        return cls(physics_client, body_uid)
+        return cls(physics_client, body_uid, name=name)
 
     @classmethod
     def from_mesh(
         cls,
         physics_client:BulletClient,
+        name:str,
         col_path: str,
         viz_path: str,
         pose: Pose = Pose.identity(),
@@ -55,7 +58,7 @@ class Body:
         scale: float = 1.0,
         rgba_color: Optional[list] = None,
     ) -> "Body":
-        #mesh = trimesh.load(viz_path)
+        mesh = trimesh.load(viz_path)
         #tf = Pose.from_matrix(mesh.principal_inertia_transform.copy())
         # com_pos = mesh.center_mass
         # com_orn = tf.rot
@@ -84,7 +87,7 @@ class Body:
             baseInertialFramePosition=offset_pose.trans,
             baseInertialFrameOrientation=offset_pose.rot.as_quat()
         )
-        return cls(physics_client, body_uid)
+        return cls(physics_client, body_uid, name=name)
 
     @contextmanager
     def no_set_pose(self, no_viz=False):

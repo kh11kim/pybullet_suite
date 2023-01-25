@@ -76,7 +76,7 @@ class BulletWorld:
         )
         self.physics_client.setTimeStep(self.dt)
         self.reset()
-        self.set_gravity([0,0,-9.8])
+        #self.set_gravity([0,0,-9.8])
     
     @property
     def bodies(self)->Dict[str, Body]:
@@ -166,6 +166,7 @@ class BulletWorld:
 
         body = Body.from_urdf(
             physics_client=self.physics_client, 
+            name=name,
             urdf_path=urdf_path, 
             pose=pose, 
             use_fixed_base=use_fixed_base,
@@ -208,6 +209,7 @@ class BulletWorld:
     ):
         body = Body.from_mesh(
             physics_client=self.physics_client, 
+            name=name,
             col_path=col_path, 
             viz_path=viz_path,
             pose=pose,
@@ -239,7 +241,7 @@ class BulletWorld:
     #     pass
     #     #TODO
 
-    def add_camera(self, intrinsic: CameraIntrinsic, extrinsic: Pose, near: float, far: float):
+    def add_camera(self, intrinsic: CameraIntrinsic, near: float, far: float):
         """Add camera to the world
 
         Args:
@@ -250,7 +252,7 @@ class BulletWorld:
         Returns:
             Camera: camera class
         """
-        camera = Camera(self.physics_client, intrinsic, extrinsic, near, far)
+        camera = Camera(self.physics_client, intrinsic, near, far)
         return camera
     
     #---------------collision detection----------------------
