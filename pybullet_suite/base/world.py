@@ -60,20 +60,28 @@ class BulletWorld:
         self._frames = {}
         self._body_names = {}
         self.const_id = {}
+        
+        connection_mode = p.GUI if gui else p.DIRECT
+
         options = ""
         if background_color is not None:
             background_color = background_color.astype(np.float64) / 255
             options = f"--background_color_red={background_color[0]} \
                         --background_color_green={background_color[1]} \
                         --background_color_blue={background_color[2]}"
+            self.physics_client = BulletClient(
+                connection_mode=connection_mode,
+                options=options
+            )
+        else:
+            self.physics_client = BulletClient(
+                connection_mode=connection_mode,
+            )
         
-        connection_mode = p.GUI if gui else p.DIRECT
+        
         
         #with no_output():
-        self.physics_client = BulletClient(
-            connection_mode=connection_mode,
-            options=options
-        )
+        
         self.physics_client.setTimeStep(self.dt)
         self.reset()
         #self.set_gravity([0,0,-9.8])

@@ -58,7 +58,8 @@ class Body:
         scale: float = 1.0,
         rgba_color: Optional[list] = None,
     ) -> "Body":
-        mesh = trimesh.load(viz_path)
+        # mesh = trimesh.load(viz_path)
+        # center = -mesh.bounding_box.centroid
         #tf = Pose.from_matrix(mesh.principal_inertia_transform.copy())
         # com_pos = mesh.center_mass
         # com_orn = tf.rot
@@ -67,7 +68,7 @@ class Body:
             fileName=viz_path,
             meshScale=np.ones(3)*scale,
             visualFramePosition=offset_pose.trans,
-            visualFrameOrientation=offset_pose.rot.as_quat(),
+            # visualFrameOrientation=offset_pose.rot.as_quat(),
             rgbaColor=rgba_color
         )
         # com_orn.as_euler()
@@ -76,7 +77,7 @@ class Body:
             fileName=col_path,
             meshScale=np.ones(3)*scale,
             collisionFramePosition=offset_pose.trans,
-            collisionFrameOrientation=offset_pose.rot.as_quat()
+            # collisionFrameOrientation=offset_pose.rot.as_quat()
         )
         body_uid = physics_client.createMultiBody(
             baseCollisionShapeIndex=col_id,
@@ -84,8 +85,8 @@ class Body:
             basePosition=pose.trans,
             baseOrientation=pose.rot.as_quat(),
             baseMass=mass,
-            baseInertialFramePosition=offset_pose.trans,
-            baseInertialFrameOrientation=offset_pose.rot.as_quat()
+            # baseInertialFramePosition=-center,
+            # baseInertialFrameOrientation=offset_pose.rot.as_quat()
         )
         return cls(physics_client, body_uid, name=name)
 

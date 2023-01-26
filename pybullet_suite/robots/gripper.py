@@ -51,6 +51,7 @@ class Gripper:
 
     def remove(self):
         self.body.set_base_pose(self.remove_pose)
+        self.grasping_box.set_base_pose(self.remove_pose)
         #self.world.remove_body(name=self.name)
 
     def detect_contact(self):
@@ -78,12 +79,11 @@ class Gripper:
         assert self.body is not None
         if width is None:
             width = self.max_opening_width
+        
         if not control:
             self.body.set_joint_angle(0, width / 2)
             self.body.set_joint_angle(1, width / 2)
         else:
-            #self.col_box1.set_base_pose(self.remove_pose*Pose(trans=[1,0,0]))
-            #self.col_box2.set_base_pose(self.remove_pose*Pose(trans=[1.5,0,0]))
             if self.finger_swept_vol:
                 self.grasping_box.set_base_pose(self.remove_pose*Pose(trans=[2,0,0]))
             self.world.physics_client.setJointMotorControlArray(
