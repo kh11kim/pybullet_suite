@@ -15,6 +15,7 @@ class Robot(Body):
         self,
         physics_client: BulletClient,
         body_uid: int,
+        name: str,
         ee_idx: Optional[int] = None,
     ):
         """Initialize Robot
@@ -26,7 +27,8 @@ class Robot(Body):
         """
         super().__init__(
             physics_client=physics_client,
-            body_uid=body_uid
+            body_uid=body_uid,
+            name=name
         )
         self.ee_idx = ee_idx if ee_idx is not None else (self.n_joints - 1)
         self.set_joint_limits()
@@ -139,6 +141,7 @@ class Robot(Body):
     def make(
         cls,
         physics_client: BulletClient,
+        name: str,
         pose: Pose = Pose.identity(),
         use_fixed_base: bool = True,
         
@@ -149,4 +152,4 @@ class Robot(Body):
             pose.rot.as_quat(),
             useFixedBase=use_fixed_base,
         )
-        return cls(physics_client, body_uid)
+        return cls(physics_client, body_uid, name)

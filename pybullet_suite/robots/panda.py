@@ -4,12 +4,13 @@ from ..utils.utils import PANDA_URDF
 class Panda(Robot):
     urdf_path = PANDA_URDF.as_posix()
 
-    def __init__(self, physics_client: BulletClient, body_uid: int):
+    def __init__(self, physics_client: BulletClient, body_uid: int, name: str):
         self.arm_idxs = range(7)
         self.finger_idxs = [8, 9]
         super().__init__(
             physics_client=physics_client,
             body_uid=body_uid,
+            name=name,
             ee_idx=10
         )
         self.max_opening_width = 0.08

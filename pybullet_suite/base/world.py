@@ -149,7 +149,8 @@ class BulletWorld:
         assert Robot in robot_class.__bases__
         robot = robot_class.make(
             self.physics_client, 
-            pose=pose
+            pose=pose,
+            name=name
         )
         self.register_body(name, robot)
         return robot
