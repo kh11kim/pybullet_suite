@@ -5,14 +5,14 @@ from pybullet_suite.robots.panda import Panda
 from itertools import combinations
 
 world = BulletWorld(gui=True)
-robot: Panda = world.load_robot("robot", robot_class=Panda)
+robot: Panda = world.load_robot(name="robot", robot_class=Panda)
 
-robot.set_arm_angles([0,0,0,-1,-1,-1,0])
+robot.set_joint_angles([0,0,0,-1,-1,-1,0])
 
 
 sm = BulletSceneMaker(world)
 box = sm.create_box("table", [0.5, 0.5, 0.5], 1,
-position=[0,0,0])
+pose=Pose(trans=[0,0,0]))
 # get_contact_points
 tic = time.time()
 #world.step(only_collision_detection=True)
@@ -31,4 +31,4 @@ result2 = world.is_body_pairwise_collision(robot, box)
 elapsed = time.time() - tic
 print(f"elapsed time for collision check: {elapsed}") # 0.001995
 
-input()
+print("test done")

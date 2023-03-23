@@ -7,11 +7,11 @@ from .tf import Rotation, Pose
 
 # TODO: use dataclass or namedtuple
 JOINT_ATRTIBUTE_NAMES = \
-    ["joint_index", "joint_name", "joint_type",
+    ("joint_index", "joint_name", "joint_type",
      "q_index", "u_index", "flags",
      "joint_damping", "joint_friction", "joint_lower_limit",
      "joint_upper_limit", "joint_max_force", "joint_max_velocity",
-     "link_name", "joint_axis", "parent_frame_pos", "parent_frame_orn", "parent_index"]
+     "link_name", "joint_axis", "parent_frame_pos", "parent_frame_orn", "parent_index")
 
 
 class Body:

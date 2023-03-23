@@ -1,11 +1,9 @@
 from contextlib import contextmanager
-import time
 import numpy as np
 from dataclasses import dataclass
 from typing import Optional, List, Dict, Union
 import pybullet as p
 from itertools import combinations
-from collections import namedtuple
 
 #from pybullet_suite.base.world import workspace_lines
 from pybullet_utils.bullet_client import BulletClient
@@ -13,7 +11,7 @@ from .body import Body
 from .camera import Camera, CameraIntrinsic
 from .tf import Rotation, Pose
 from .robot import Robot
-from .util import no_output
+import io
 
 SOLVER_ITERATIONS = 150
 COLLISION_DISTANCE = 0.
@@ -60,31 +58,28 @@ class BulletWorld:
         self._frames = {}
         self._body_names = {}
         self.const_id = {}
-        
+        self.temp_stdout = io.BytesIO()
+
         connection_mode = p.GUI if gui else p.DIRECT
 
         options = ""
         if background_color is not None:
-            background_color = background_color.astype(np.float64) / 255
+            background_color = np.array(background_color).astype(np.float64) / 255
             options = f"--background_color_red={background_color[0]} \
                         --background_color_green={background_color[1]} \
                         --background_color_blue={background_color[2]}"
+            
             self.physics_client = BulletClient(
-                connection_mode=connection_mode,
-                options=options
-            )
+                    connection_mode=connection_mode,
+                    options=options)
         else:
             self.physics_client = BulletClient(
-                connection_mode=connection_mode,
-            )
-        
-        
-        
-        #with no_output():
+                    connection_mode=connection_mode)
         
         self.physics_client.setTimeStep(self.dt)
         self.reset()
         #self.set_gravity([0,0,-9.8])
+
     
     @property
     def bodies(self)->Dict[str, Body]:

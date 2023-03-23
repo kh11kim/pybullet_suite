@@ -6,5 +6,11 @@ setup(
    description='Pybullet wrapper for easy use',
    author='Kanghyun Kim',
    author_email='kh11kim@kaist.ac.kr',
+   install_requires=[
+      "numpy",
+      "scipy",
+      "pybullet",
+      "trimesh"
+   ],
    packages=find_packages(),  #same as name
 )
