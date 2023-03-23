@@ -1,6 +1,7 @@
 from ..base import *
 from ..utils.scene_maker import *
 from ..utils.utils import HAND_URDF
+import copy 
 
 class Gripper:
     def __init__(self, world: BulletWorld, sm: BulletSceneMaker, finger_swept_vol=False):
@@ -12,11 +13,26 @@ class Gripper:
         self.T_body_tcp = Pose(Rotation.identity(), [0.0, 0.0, 0.103])
         self.T_tcp_body = self.T_body_tcp.inverse()
         self.finger_swept_vol = finger_swept_vol
-
+        self.hand_mesh = trimesh.load_mesh("./data/franka_hand/hand.obj").as_open3d
         self.remove_pose = Pose(trans=[10,10,10]) * self.T_tcp_body
         self.w = 0.0085
-        # self.T_tcp_finger_col_box1 = Pose(trans=[0, 0.04+self.w, 0])
-        # self.T_tcp_finger_col_box2 = Pose(trans=[0, -0.04-self.w, 0])
+
+    def get_hand_point_cloud(self, width=0.08):
+        hand_mesh = trimesh.load_mesh("./data/franka_hand/hand.obj").as_open3d
+        finger_mesh1 = trimesh.load_mesh("./data/franka_hand/finger.obj").as_open3d
+        finger_mesh2 = copy.deepcopy(finger_mesh1)
+        
+        finger_mesh1.translate((0, 0.0, 0.0584))
+        finger_mesh2.rotate(Rotation.from_euler("xyz", [0,0,np.pi]).as_matrix(), center=(0,0,0)) 
+        finger_mesh2.translate((0, -0.0, 0.0584))
+        hand_mesh.translate((0,0,-0.103))
+        finger_mesh1.translate((0,width/2,-0.103))
+        finger_mesh2.translate((0,-width/2,-0.103))
+        
+        pc1 = hand_mesh.sample_points_uniformly(500)
+        pc2 = finger_mesh1.sample_points_uniformly(100)
+        pc3 = finger_mesh2.sample_points_uniformly(100)
+        return np.vstack([pc1.points, pc2.points, pc3.points])
 
     def reset(self, T_world_tcp: Pose, name=None):
         if name is None:
@@ -28,12 +44,8 @@ class Gripper:
             self.body = self.world.load_urdf(self.name, self.urdf_path, T_world_body)
             if self.finger_swept_vol:
                 self.grasping_box = self.sm.create_box("grasping_box", [0.0085, 0.04, 0.0085], 0.01, pose=T_world_tcp, rgba_color=[0,1,0,0.4])
-            #self.col_box1 = self.sm.create_box("col_box1", [self.w]*3, 0.01, pose=T_world_tcp*self.T_tcp_finger_col_box1, rgba_color=[1,0,0,0.4])
-            #self.col_box2 = self.sm.create_box("col_box2", [self.w]*3, 0.01, pose=T_world_tcp*self.T_tcp_finger_col_box2, rgba_color=[1,0,0,0.4])
         else:
             self.body.set_base_pose(T_world_body)
-            #self.col_box1.set_base_pose(T_world_tcp*self.T_tcp_finger_col_box1)
-            #self.col_box2.set_base_pose(T_world_tcp*self.T_tcp_finger_col_box2)
             if self.finger_swept_vol:
                 self.grasping_box.set_base_pose(T_world_tcp)
         self.grip()
@@ -41,8 +53,6 @@ class Gripper:
     def is_grasp_candidate(self, obj:Body):
         is_in_swept_vol = self.world.is_body_pairwise_collision(self.grasping_box, obj)
         is_col_gripper = self.world.is_body_pairwise_collision(self.body, obj)
-        # is_col_finger1 = self.world.is_body_pairwise_collision(self.col_box1, obj)
-        # is_col_finger2 = self.world.is_body_pairwise_collision(self.col_box2, obj)
         return is_in_swept_vol and not is_col_gripper
 
     def get_tcp_pose(self):

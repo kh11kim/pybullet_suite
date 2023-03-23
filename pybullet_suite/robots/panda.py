@@ -94,9 +94,12 @@ class Panda(Robot):
         max_iter: int = 100,
         start_central=True
     ):
-        return super().inverse_kinematics(
+        result = super().inverse_kinematics(
             pos, pose, tol, max_iter, start_central
-        )[self.arm_idxs]
+        )
+        if result is not None:
+            return result[self.arm_idxs]
+        return None
 
     # forward kinematics do not need overriding
 

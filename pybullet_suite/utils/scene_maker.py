@@ -260,7 +260,7 @@ class BulletSceneMaker:
             body_name=body_name,
             half_extents=np.array([length, width, height]) / 2,
             mass=0.0,
-            position=np.array([x_offset, y_offset, -height / 2 + z_offset]),
+            pose=Pose(trans=np.array([x_offset, y_offset, -height / 2 + z_offset])),
             specular_color=np.zeros(3),
             rgba_color=np.array([0.95, 0.95, 0.95, 0.5]),
             lateral_friction=lateral_friction,
