@@ -1,4 +1,5 @@
 import os
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 DICE_URDF = dir_path + "/urdfs/dice/urdf/dice.urdf"

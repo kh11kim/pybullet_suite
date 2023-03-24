@@ -1,7 +1,8 @@
 from ..base import *
 from ..utils.scene_maker import *
-from ..utils.utils import HAND_URDF
+#from ..utils.utils import HAND_URDF
 import copy 
+from ..base.data import HAND_URDF
 
 class Gripper:
     def __init__(self, world: BulletWorld, sm: BulletSceneMaker, finger_swept_vol=False):

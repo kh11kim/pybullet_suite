@@ -127,8 +127,7 @@ class BulletSceneMaker:
         radius: float,
         height: float,
         mass: float,
-        position: np.ndarray,
-        orientation: None,
+        pose: Pose,
         rgba_color: Optional[np.ndarray] = np.zeros(4),
         specular_color: np.ndarray = np.zeros(3),
         ghost: bool = False,
@@ -162,8 +161,7 @@ class BulletSceneMaker:
             body_name,
             geom_type=self.physics_client.GEOM_CYLINDER,
             mass=mass,
-            position=position,
-            orientation=orientation,
+            pose=pose,
             ghost=ghost,
             lateral_friction=lateral_friction,
             spinning_friction=spinning_friction,
@@ -227,7 +225,7 @@ class BulletSceneMaker:
             body_name=body_name,
             half_extents=np.array([3.0, 3.0, 0.01]),
             mass=0.0,
-            position=np.array([0.0, 0.0, z_offset - 0.01]),
+            pose=Pose(trans=[0.0, 0.0, z_offset - 0.01]),
             specular_color=np.zeros(3),
             rgba_color=np.array([0.85, 0.85, 0.85, 1.0]),
         )
@@ -273,7 +271,7 @@ class BulletSceneMaker:
                 body_name=name,
                 radius=0.02,
                 mass=0.0,
-                position=position,
+                pose=Pose(trans=position),
                 rgba_color=[*rgb_color,0.3],
                 ghost=False
             )

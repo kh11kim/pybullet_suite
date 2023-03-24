@@ -1,8 +1,9 @@
 from ..base import *
-from ..utils.utils import PANDA_URDF
+#from ..utils.utils import PANDA_URDF
+from ..base.data import PANDA_URDF
 
 class Panda(Robot):
-    urdf_path = PANDA_URDF.as_posix()
+    urdf_path = PANDA_URDF #.as_posix()
 
     def __init__(self, physics_client: BulletClient, body_uid: int, name: str):
         self.arm_idxs = range(7)
@@ -122,7 +123,7 @@ class Panda(Robot):
 
 if __name__ == "__main__":
     world = BulletWorld(gui=True)
-    robot: Panda = world.load_robot("robot", robot_class=Panda)
+    robot: Panda = world.load_robot(name="robot", robot_class=Panda)
     robot.forward_kinematics([0, 0, 0, 0, 0, 0, 0])
     robot.set_joint_angles([0, 0, 0, 0, 0, 0, 0])
     input()

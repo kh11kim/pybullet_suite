@@ -4,8 +4,6 @@ from dataclasses import dataclass
 from typing import Optional, List, Dict, Union
 import pybullet as p
 from itertools import combinations
-
-#from pybullet_suite.base.world import workspace_lines
 from pybullet_utils.bullet_client import BulletClient
 from .body import Body
 from .camera import Camera, CameraIntrinsic
@@ -77,9 +75,29 @@ class BulletWorld:
                     connection_mode=connection_mode)
         
         self.physics_client.setTimeStep(self.dt)
+        self.set_debug_visualizer(False)
         self.reset()
         #self.set_gravity([0,0,-9.8])
 
+    def set_debug_visualizer(self, onoff:bool=False):
+        # or type "g" in debug window
+        p = self.physics_client
+        p.configureDebugVisualizer(p.COV_ENABLE_GUI, onoff)
+        p.configureDebugVisualizer(p.COV_ENABLE_RGB_BUFFER_PREVIEW, onoff)
+        p.configureDebugVisualizer(p.COV_ENABLE_DEPTH_BUFFER_PREVIEW, onoff)
+        p.configureDebugVisualizer(p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, onoff)
+
+    def set_view(
+        self,
+        eye_point:np.ndarray, 
+        target_point:Optional[np.ndarray]=np.zeros(3)
+    ):
+        delta = np.array(eye_point) - np.array(target_point)
+        d = np.linalg.norm(delta)
+        yaw = (np.arctan2(delta[1], delta[0]) +np.pi/2) *180/np.pi
+        pitch = -np.arctan2(delta[2], delta[0]) *180/np.pi
+        p.resetDebugVisualizerCamera(
+            d, yaw, pitch, target_point)
     
     @property
     def bodies(self)->Dict[str, Body]:
@@ -124,9 +142,6 @@ class BulletWorld:
             self.physics_client.performCollisionDetection()
         else:
             self.physics_client.stepSimulation()
-        #if self.gui: #and (self.sim_time - self.last_render_time) > self.dt_gui:
-            #time.sleep(self.dt_gui)
-            #self.last_render_time += self.dt_gui
         self.sim_time += self.dt
     
     def save_state(self):
@@ -484,6 +499,7 @@ class BulletWorld:
 if __name__ == "__main__":
     world = BulletWorld(gui=True)
     panda = world.load_urdf("panda", "data/urdfs/panda/franka_panda.urdf")
+    world.set_view([0.5, 0., 0.5], [0,0,0])
     box_pose = Pose(Rotation.identity(), [0.3, 0, 0.1])
     box = world.load_urdf("box", "data/urdfs/blocks/cube.urdf", box_pose, scale=5.)
     input()

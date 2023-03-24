@@ -8,7 +8,7 @@
       "name": "Python: 모듈",
       "type": "python",
       "request": "launch",
-      "module": "pybullet_suite.robots.panda"
+      "module": "pybullet_suite.world"
     },
     {
       "name": "Python: 현재 파일",
