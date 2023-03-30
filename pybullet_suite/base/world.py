@@ -356,9 +356,9 @@ class BulletWorld:
         link2: int
     ):
         if isinstance(body1, str):
-            body1 = self.bodies[str]
-        if isinstance(body1, str):
-            body2 = self.bodies[str]
+            body1 = self.bodies[body1]
+        if isinstance(body2, str):
+            body2 = self.bodies[body2]
         point = self.get_closest_points(
             body1=body1, body2=body2, 
             link1=link1, link2=link2)
