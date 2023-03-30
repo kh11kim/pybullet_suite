@@ -47,6 +47,7 @@ class BulletWorld:
         gui: bool = False,
         dt = 1.0 / 1000.0,
         dt_gui = 1.0/100.,
+        gravity=[0, 0, -9.81],
         background_color = None
     ):
         self.gui = gui
@@ -77,7 +78,7 @@ class BulletWorld:
         self.physics_client.setTimeStep(self.dt)
         self.set_debug_visualizer(False)
         self.reset()
-        #self.set_gravity([0,0,-9.8])
+        self.set_gravity(gravity)
 
     def set_debug_visualizer(self, onoff:bool=False):
         # or type "g" in debug window
