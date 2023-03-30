@@ -15,9 +15,9 @@ class Panda(Robot):
             ee_idx=10
         )
         self.max_opening_width = 0.08
-        self.arm_lower_limit = self.joint_lower_limit[self.arm_idxs]
-        self.arm_upper_limit = self.joint_upper_limit[self.arm_idxs]
-        self.arm_central = (self.arm_lower_limit + self.arm_upper_limit)/2
+        self.joint_lower_limit = self.joint_lower_limit[self.arm_idxs]
+        self.joint_upper_limit = self.joint_upper_limit[self.arm_idxs]
+        self.joint_central = (self.joint_lower_limit + self.joint_upper_limit)/2
         self.open()
         self.ctrl_mode = "pos" # ["pos", "vel", "torque"] 
 
@@ -27,9 +27,9 @@ class Panda(Robot):
     def get_joint_velocities(self):
         return super().get_joint_velocities()[self.arm_idxs]
 
-    def get_random_arm_angles(self):
-        q = np.random.uniform(low=self.arm_lower_limit,
-                              high=self.arm_upper_limit)
+    def get_random_config(self):
+        q = np.random.uniform(low=self.joint_lower_limit,
+                              high=self.joint_upper_limit)
         return q
 
     def set_ctrl_mode(self, mode):
