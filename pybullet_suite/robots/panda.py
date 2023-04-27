@@ -19,7 +19,7 @@ class Panda(Robot):
         self.joint_upper_limit = self.joint_upper_limit[self.arm_idxs]
         self.joint_central = (self.joint_lower_limit + self.joint_upper_limit)/2
         self.open()
-        self.ctrl_mode = "pos" # ["pos", "vel", "torque"] 
+        self.ctrl_mode = "pos" #["pos", "vel", "torque"] 
 
     def get_joint_angles(self):
         return super().get_joint_angles()[self.arm_idxs]

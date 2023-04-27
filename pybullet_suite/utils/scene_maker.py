@@ -152,7 +152,7 @@ class BulletSceneMaker:
         """
         visual_kwargs = {
             "radius": radius,
-            "length": height,
+            "height": height,
             "specularColor": specular_color,
             "rgbaColor": rgba_color,
         }
@@ -168,7 +168,55 @@ class BulletSceneMaker:
             visual_kwargs=visual_kwargs,
             collision_kwargs=collision_kwargs,
         )
+    
+    def create_capsule(
+        self,
+        body_name: str,
+        radius: float,
+        height: float,
+        mass: float,
+        pose: Pose,
+        rgba_color: Optional[np.ndarray] = np.zeros(4),
+        specular_color: np.ndarray = np.zeros(3),
+        ghost: bool = False,
+        lateral_friction: Optional[float] = None,
+        spinning_friction: Optional[float] = None,
+    ) -> Body:
+        """Create a cylinder.
 
+        Args:
+            body_name (str): The name of the body. Must be unique in the sim.
+            radius (float): The radius in meter.
+            height (float): The height in meter.
+            mass (float): The mass in kg.
+            position (np.ndarray): The position, as (x, y, z).
+            rgba_color (np.ndarray, optional): Body color, as (r, g, b, a). Defaults as [0, 0, 0, 0]
+            specular_color (np.ndarray, optional): Specular color, as (r, g, b). Defaults to [0, 0, 0].
+            ghost (bool, optional): Whether the body can collide. Defaults to False.
+            lateral_friction (float or None, optional): Lateral friction. If None, use the default pybullet
+                value. Defaults to None.
+            spinning_friction (float or None, optional): Spinning friction. If None, use the default pybullet
+                value. Defaults to None.
+        """
+        visual_kwargs = {
+            "radius": radius,
+            "length": height,
+            "specularColor": specular_color,
+            "rgbaColor": rgba_color,
+        }
+        collision_kwargs = {"radius": radius, "height": height}
+        return self._create_geometry(
+            body_name,
+            geom_type=self.physics_client.GEOM_CAPSULE,
+            mass=mass,
+            pose=pose,
+            ghost=ghost,
+            lateral_friction=lateral_friction,
+            spinning_friction=spinning_friction,
+            visual_kwargs=visual_kwargs,
+            collision_kwargs=collision_kwargs,
+        )
+    
     def create_sphere(
         self,
         body_name: str,

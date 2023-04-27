@@ -78,7 +78,7 @@ class Robot(Body):
             pos, orn = pose.trans, pose.rot.as_quat()
         with self.no_set_joint():
             if start_central:
-                self.set_joint_angles(self.arm_central)
+                self.set_joint_angles(self.joint_central)
             for _ in range(max_iter):
                 joint_angles = self.physics_client.calculateInverseKinematics(
                     bodyIndex=self.uid,

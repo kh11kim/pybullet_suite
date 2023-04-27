@@ -11,6 +11,7 @@ robot.set_joint_angles([0,0,0,-1,-1,-1,0])
 
 sm = BulletSceneMaker(world)
 sm.create_plane()
+sm.create_capsule("capsule", 0.1, 0.3, 0.1, Pose.identity(), rgba_color=[1,0,0,0.4])
 # box = sm.create_box("table", [0.5, 0.5, 0.5], 1,
 #                     pose=Pose(trans=[0,0,0]))
 world.set_view([1.7, -0.4, 1.], [0,0,0])

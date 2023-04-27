@@ -14,7 +14,7 @@ for root, dirs, files in os.walk(hh):
 
 setup(
    name='pybullet_suite',
-   version='0.0.12', 
+   version='0.0.13', 
    description='Pybullet wrapper for easy use',
    author='Kanghyun Kim',
    author_email='kh11kim@kaist.ac.kr',
